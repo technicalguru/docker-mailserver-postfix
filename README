@@ -1,0 +1,30 @@
+BASIC SETUP (no SSL)
+--------------------
+http://www.postfix.org/BASIC_CONFIGURATION_README.html
+
+MYHOSTNAME=mail.ralph-schuster.eu
+MYORIGIN=mail.ralph-schuster.eu
+MYDOMAIN=ralph-schuster.eu
+POSTMASTER=postmaster@ralph-schuster.eu
+
+-> test ob main.cf existiert => anlegen mit Template
+-> test ob master.cf existiert => anlegen mit Template
+
+main.cf:
+1. myhostname = mail.ralph-schuster.eu
+2. myorigin   = mail.ralph-schuster.eu
+3. mydomain   = ralph-schuster.eu
+4. mydestination = $myhostname localhost.$mydomain localhost $mydomain
+   => to be replaced later by mail.ralph-schuster.eu
+5. mynetworks_style = host
+
+/etc/aliases:
+1. postmaster: postmaster@ralph-schuster.eu
+2. root: postmaster@ralph-schuster.eu
+3. > "newaliases"
+
+syslog:
+1. > apt-get install rsyslog
+2. > service rsyslog start
+
+
