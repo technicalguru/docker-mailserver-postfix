@@ -27,4 +27,24 @@ syslog:
 1. > apt-get install rsyslog
 2. > service rsyslog start
 
+SSL Setup
+---------
+PF_TLS_CERT_FILE
+PF_TLS_KEY_FILE
+PF_TLS_CAFILE
+PF_TLS_CAPATH
+
+main.cf:
+1. smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+2. smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+3. smtpd_tls_CAfile = /etc/postfix/CAcert.pem
+4. smtpd_tls_CApath = /etc/ssl/certs/
+5. smtpd_tls_security_level = may
+
+master.cf:
+1. smtps      inet  n       -       -       -       -       smtpd
+     -o smtpd_tls_wrappermode=yes
+     -o smtpd_sasl_auth_enable=yes
+	...
+
 
