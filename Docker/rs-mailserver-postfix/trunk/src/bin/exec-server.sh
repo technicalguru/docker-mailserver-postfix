@@ -11,16 +11,76 @@ SYNC_CHROOT="y"
 
 test -f /etc/default/postfix && . /etc/default/postfix
 
-test -x $DAEMON && test -f /etc/postfix/main.cf || exit 0
+test -x $DAEMON  || exit 0
+
+# Check env vars
+if [[ -z "${PF_MYDOMAIN}" ]]; then
+	PF_MYDOMAIN=localdomain
+fi
+if [[ -z "${PF_MYHOSTNAME}" ]]; then
+	PF_MYHOSTNAME=$(hostname -f)
+fi
+if [[ -z "${PF_MYORIGIN}" ]]; then
+	PF_MYORIGIN=$PF_MYHOSTNAME
+fi
+if [[ -z "${PF_TLS_CERT_FILE}" ]]; then
+	PF_TLS_CERT_FILE=/etc/ssl/certs/ssl-cert-snakeoil.pem
+fi
+if [[ -z "${PF_TLS_KEY_FILE}" ]]; then
+	PF_TLS_KEY_FILE=/etc/ssl/private/ssl-cert-snakeoil.key
+fi
+if [[ -z "${PF_TLS_CAFILE}" ]]; then
+	PF_TLS_CAFILE=/etc/postfix/CAcert.pem
+fi
+if [[ -z "${PF_TLS_CAPATH}" ]]; then
+	PF_TLS_CAPATH=/etc/ssl/certs
+fi
+
 
 configure_postfix() {
 	# Check main.cf
-		# Check env var PF_MYDOMAIN
-		# Check env var PF_MYORIGIN
-		# Check env var PF_MYHOSTNAME
+	if [ ! -f /etc/postfix/main.cf ]; then
+		# Replace PF_MYDOMAIN
+		sed "s/__PF_MYDOMAIN__/$PF_MYDOMAIN/g" /usr/local/rs-mailserver/postfix/main.cf >/etc/postfix/main.cf
+		# Replace PF_MYORIGIN
+		sed -i "s/__PF_MYHOSTNAME__/$PF_MYHOSTNAME/g" /etc/postfix/main.cf
+		# Replace PF_MYHOSTNAME
+		sed -i "s/__PF_MYORIGIN__/$PF_MYORIGIN/g" /etc/postfix/main.cf
+		# Replace PF_TLS_CERT_FILE
+		sed -i "s~__PF_TLS_CERT_FILE__~$PF_TLS_CERT_FILE~g" /etc/postfix/main.cf
+		# Replace PF_TLS_KEY_FILE
+		sed -i "s~__PF_TLS_KEY_FILE__~$PF_TLS_KEY_FILE~g" /etc/postfix/main.cf
+		# Replace PF_TLS_CAFILE
+		if [ ! -f $PF_TLS_CAFILE ]; then
+			sed -i "s/smtpd_tls_CAfile/# smtpd_tls_CAfile/g" /etc/postfix/main.cf
+		else
+			sed -i "s~__PF_TLS_CAFILE__~$PF_TLS_CAFILE~g" /etc/postfix/main.cf
+		fi
+		# Replace PF_TLS_CAPATH
+		if [ ! -d $PF_TLS_CAPATH ]; then
+			sed -i "s/smtpd_tls_CApath/# smtpd_tls_CApath" /etc/postfix/main.cf
+		else
+			sed -i "s~__PF_TLS_CAPATH__~$PF_TLS_CAPATH~g" /etc/postfix/main.cf
+		fi
+	fi
 
 	# Check master.cf
+	if [ ! -f /etc/postfix/master.cf ]; then
+		cp /usr/local/rs-mailserver/postfix/master.cf /etc/postfix/master.cf
+	fi
 
+	# Check /etc/aliases
+	if [ ! -f /etc/aliases ]; then
+		# Replace PF_MYDOMAIN
+		sed "s/__PF_MYDOMAIN__/$PF_MYDOMAIN/g" /usr/local/rs-mailserver/postfix/aliases >/etc/aliases
+		# Replace PF_MYORIGIN
+		sed -i "s/__PF_MYHOSTNAME__/$PF_MYHOSTNAME/g" /etc/aliases
+		# Replace PF_MYHOSTNAME
+		sed -i "s/__PF_MYORIGIN__/$PF_MYORIGIN/g" /etc/aliases
+	fi
+
+	# Make sure to always have aliases configured
+	newaliases
 }
 
 configure_instance() {
@@ -152,6 +212,7 @@ function get_state {
 }
 
 service rsyslog start
+configure_postfix
 configure_instance -
 /usr/sbin/postfix quiet-quick-start
 
@@ -170,5 +231,6 @@ while true; do
         echo "Postfix is not running."
         break
     fi
+	sleep 5
 done
 
