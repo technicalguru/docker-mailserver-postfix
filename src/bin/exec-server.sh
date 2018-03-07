@@ -35,51 +35,74 @@ fi
 if [[ -z "${PF_TLS_CAPATH}" ]]; then
 	PF_TLS_CAPATH=/etc/ssl/certs
 fi
+if [[ -z "${PF_DB_HOST}" ]]; then
+	PF_DB_HOST=localhost
+fi
+if [[ -z "${PF_DB_NAME}" ]]; then
+	PF_DB_NAME=postfix
+fi
+if [[ -z "${PF_DB_USER}" ]]; then
+	PF_DB_USER=postfix
+fi
+if [[ -z "${PF_DB_PASS}" ]]; then
+	PF_DB_PASS=password
+fi
 
+replace_var() {
+	sed -i "s/__$2__/$$2/g" $1
+}
+
+copy_template_file() {
+	TMP_SRC=$1
+    TMP_DST=$2
+
+	if [ ! -f $TEMP_DST ]; then
+		cp $TEMP_SRC $TEMP_DST
+		replace_var $TEMP_DST 'PF_MYDOMAIN'
+		replace_var $TEMP_DST 'PF_MYHOSTNAME'
+		replace_var $TEMP_DST 'PF_MYORIGIN'
+		replace_var $TEMP_DST 'PF_TLS_CERT_FILE'
+		replace_var $TEMP_DST 'PF_TLS_KEY_FILE'
+		if [ ! -f $PF_TLS_CAFILE ]; then
+			sed -i "s/^.*PF_TLS_CAFILE/# PF_TLS_CAFILE does not exist/g" $TEMP_DST
+		else
+			replace_var $TEMP_DST 'PF_TLS_CAFILE'
+		fi
+		if [ ! -f $PF_TLS_CAPATH ]; then
+			sed -i "s/^.*PF_TLS_CAPATH/# PF_TLS_CAPATH does not exist/g" $TEMP_DST
+		else
+			replace_var $TEMP_DST 'PF_TLS_CAPATH'
+		fi
+		replace_var $TEMP_DST 'PF_DB_HOST'
+		replace_var $TEMP_DST 'PF_DB_NAME'
+		replace_var $TEMP_DST 'PF_DB_USER'
+		replace_var $TEMP_DST 'PF_DB_PASS'
+	fi
+}
 
 configure_postfix() {
-	# Check main.cf
-	if [ ! -f /etc/postfix/main.cf ]; then
-		# Replace PF_MYDOMAIN
-		sed "s/__PF_MYDOMAIN__/$PF_MYDOMAIN/g" /usr/local/rs-mailserver/postfix/main.cf >/etc/postfix/main.cf
-		# Replace PF_MYORIGIN
-		sed -i "s/__PF_MYHOSTNAME__/$PF_MYHOSTNAME/g" /etc/postfix/main.cf
-		# Replace PF_MYHOSTNAME
-		sed -i "s/__PF_MYORIGIN__/$PF_MYORIGIN/g" /etc/postfix/main.cf
-		# Replace PF_TLS_CERT_FILE
-		sed -i "s~__PF_TLS_CERT_FILE__~$PF_TLS_CERT_FILE~g" /etc/postfix/main.cf
-		# Replace PF_TLS_KEY_FILE
-		sed -i "s~__PF_TLS_KEY_FILE__~$PF_TLS_KEY_FILE~g" /etc/postfix/main.cf
-		# Replace PF_TLS_CAFILE
-		if [ ! -f $PF_TLS_CAFILE ]; then
-			sed -i "s/smtpd_tls_CAfile/# smtpd_tls_CAfile/g" /etc/postfix/main.cf
-		else
-			sed -i "s~__PF_TLS_CAFILE__~$PF_TLS_CAFILE~g" /etc/postfix/main.cf
-		fi
-		# Replace PF_TLS_CAPATH
-		if [ ! -d $PF_TLS_CAPATH ]; then
-			sed -i "s/smtpd_tls_CApath/# smtpd_tls_CApath" /etc/postfix/main.cf
-		else
-			sed -i "s~__PF_TLS_CAPATH__~$PF_TLS_CAPATH~g" /etc/postfix/main.cf
-		fi
-	fi
+	# POSTFIX
+	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/master.cf' '/etc/postfix/master.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
 
-	# Check master.cf
-	if [ ! -f /etc/postfix/master.cf ]; then
-		cp /usr/local/rs-mailserver/postfix/master.cf /etc/postfix/master.cf
-	fi
+	# ALIASES
+	#copy_template_file '/usr/local/rs-mailserver/postfix/aliases' '/etc/aliases'
 
-	# Check /etc/aliases
-	if [ ! -f /etc/aliases ]; then
-		# Replace PF_MYDOMAIN
-		sed "s/__PF_MYDOMAIN__/$PF_MYDOMAIN/g" /usr/local/rs-mailserver/postfix/aliases >/etc/aliases
-		# Replace PF_MYORIGIN
-		sed -i "s/__PF_MYHOSTNAME__/$PF_MYHOSTNAME/g" /etc/aliases
-		# Replace PF_MYHOSTNAME
-		sed -i "s/__PF_MYORIGIN__/$PF_MYORIGIN/g" /etc/aliases
-	fi
+	# DOVECOT
+	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot.conf' '/etc/dovecot/dovecot.conf'
+	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot-sql.conf' '/etc/dovecot/dovecot-sql.conf'
 
-	# Make sure to always have aliases configured
+	# SQL CONFIGS
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/accounts.cf' '/etc/postfix/sql/accounts.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/aliases.cf' '/etc/postfix/sql/aliases.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/domains.cf' '/etc/postfix/sql/domains.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/recipient-access.cf' '/etc/postfix/sql/recipient-access.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/sender-login-maps.cf' '/etc/postfix/sql/sender-login-maps.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
+	chmod -R 660 /etc/postfix/sql
+
+    postmap /etc/postfix/without_ptr 
 	newaliases
 }
 
@@ -215,6 +238,7 @@ service rsyslog start
 configure_postfix
 configure_instance -
 /usr/sbin/postfix quiet-quick-start
+
 
 while true; do
     state=$(get_state)

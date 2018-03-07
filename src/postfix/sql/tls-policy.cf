@@ -1,0 +1,5 @@
+user = __PF_DB_USER__
+password = __PF_DB_PASS__
+hosts = __PF_DB_HOST__
+dbname = __PF_DB_NAME__
+query = SELECT policy, params FROM tlspolicies WHERE domain = '%s'

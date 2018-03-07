@@ -1,124 +1,199 @@
-#
-# Postfix master process configuration file.  For details on the format
-# of the file, see the master(5) manual page (command: "man 5 master" or
-# on-line: http://www.postfix.org/master.5.html).
-#
-# Do not forget to execute "postfix reload" after editing this file.
-#
 # ==========================================================================
 # service type  private unpriv  chroot  wakeup  maxproc command + args
-#               (yes)   (yes)   (yes)   (never) (100)
+#               (yes)   (yes)   (no)    (never) (100)
 # ==========================================================================
-smtp      inet  n       -       -       -       -       smtpd
-#smtp      inet  n       -       -       -       1       postscreen
-#smtpd     pass  -       -       -       -       -       smtpd
-#dnsblog   unix  -       -       -       -       0       dnsblog
-#tlsproxy  unix  -       -       -       -       0       tlsproxy
-#submission inet n       -       -       -       -       smtpd
-#  -o syslog_name=postfix/submission
-#  -o smtpd_tls_security_level=encrypt
-#  -o smtpd_sasl_auth_enable=yes
-#  -o smtpd_reject_unlisted_recipient=no
-#  -o smtpd_client_restrictions=$mua_client_restrictions
-#  -o smtpd_helo_restrictions=$mua_helo_restrictions
-#  -o smtpd_sender_restrictions=$mua_sender_restrictions
-#  -o smtpd_recipient_restrictions=
-#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-#  -o milter_macro_daemon_name=ORIGINATING
-smtps     inet  n       -       -       -       -       smtpd
-  -o syslog_name=postfix/smtps
-  -o smtpd_tls_wrappermode=yes
-  -o smtpd_sasl_auth_enable=yes
-  -o smtpd_reject_unlisted_recipient=no
-  -o smtpd_client_restrictions=$mua_client_restrictions
-  -o smtpd_helo_restrictions=$mua_helo_restrictions
-  -o smtpd_sender_restrictions=$mua_sender_restrictions
-  -o smtpd_recipient_restrictions=
-  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-  -o milter_macro_daemon_name=ORIGINATING
-#628       inet  n       -       -       -       -       qmqpd
-pickup    unix  n       -       -       60      1       pickup
-cleanup   unix  n       -       -       -       0       cleanup
+
+###
+### Postscreen-Service: Prüft eingehende SMTP-Verbindungen auf Spam-Server
+###
+smtp      inet  n       -       n       -       1       postscreen
+    -o smtpd_sasl_auth_enable=no
+###
+### SMTP-Daemon hinter Postscreen: Schleift E-Mails zur Filterung durch Amavis
+###
+smtpd     pass  -       -       n       -       -       smtpd
+    -o smtpd_sasl_auth_enable=no
+###
+### dnsblog führt DNS-Abfragen für Blocklists durch
+###
+dnsblog   unix  -       -       n       -       0       dnsblog
+###
+### tlsproxy gibt Postscreen TLS support
+###
+tlsproxy  unix  -       -       n       -       0       tlsproxy
+###
+### Submission-Zugang für Clients: Für Mailclients gelten andere Regeln, als für andere Mailserver (siehe smtpd_ in main.cf)
+###
+submission inet n       -       n       -       -       smtpd
+    -o syslog_name=postfix/submission
+    -o smtpd_tls_security_level=encrypt
+    -o smtpd_sasl_auth_enable=yes
+    -o smtpd_sasl_type=dovecot
+    -o smtpd_sasl_path=private/auth
+    -o smtpd_sasl_security_options=noanonymous
+    -o smtpd_relay_restrictions=reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_sender_login_maps=mysql:/etc/postfix/sql/sender-login-maps.cf
+    -o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_sender_login_mismatch,permit_sasl_authenticated,reject
+    -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_helo_required=no
+    -o smtpd_helo_restrictions=
+    -o milter_macro_daemon_name=ORIGINATING
+    -o cleanup_service_name=submission-header-cleanup
+###
+### Weitere wichtige Dienste für den Serverbetrieb
+###
+pickup    unix  n       -       n       60      1       pickup
+cleanup   unix  n       -       n       -       0       cleanup
 qmgr      unix  n       -       n       300     1       qmgr
-#qmgr     unix  n       -       n       300     1       oqmgr
-tlsmgr    unix  -       -       -       1000?   1       tlsmgr
-rewrite   unix  -       -       -       -       -       trivial-rewrite
-bounce    unix  -       -       -       -       0       bounce
-defer     unix  -       -       -       -       0       bounce
-trace     unix  -       -       -       -       0       bounce
-verify    unix  -       -       -       -       1       verify
-flush     unix  n       -       -       1000?   0       flush
+tlsmgr    unix  -       -       n       1000?   1       tlsmgr
+rewrite   unix  -       -       n       -       -       trivial-rewrite
+bounce    unix  -       -       n       -       0       bounce
+defer     unix  -       -       n       -       0       bounce
+trace     unix  -       -       n       -       0       bounce
+verify    unix  -       -       n       -       1       verify
+flush     unix  n       -       n       1000?   0       flush
 proxymap  unix  -       -       n       -       -       proxymap
 proxywrite unix -       -       n       -       1       proxymap
-smtp      unix  -       -       -       -       -       smtp
-relay     unix  -       -       -       -       -       smtp
-#       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
-showq     unix  n       -       -       -       -       showq
-error     unix  -       -       -       -       -       error
-retry     unix  -       -       -       -       -       error
-discard   unix  -       -       -       -       -       discard
+smtp      unix  -       -       n       -       -       smtp
+relay     unix  -       -       n       -       -       smtp
+showq     unix  n       -       n       -       -       showq
+error     unix  -       -       n       -       -       error
+retry     unix  -       -       n       -       -       error
+discard   unix  -       -       n       -       -       discard
 local     unix  -       n       n       -       -       local
 virtual   unix  -       n       n       -       -       virtual
-lmtp      unix  -       -       -       -       -       lmtp
-anvil     unix  -       -       -       -       1       anvil
-scache    unix  -       -       -       -       1       scache
-#
-# ====================================================================
-# Interfaces to non-Postfix software. Be sure to examine the manual
-# pages of the non-Postfix software to find out what options it wants.
-#
-# Many of the following services use the Postfix pipe(8) delivery
-# agent.  See the pipe(8) man page for information about ${recipient}
-# and other message envelope options.
-# ====================================================================
-#
-# maildrop. See the Postfix MAILDROP_README file for details.
-# Also specify in main.cf: maildrop_destination_recipient_limit=1
-#
-maildrop  unix  -       n       n       -       -       pipe
-  flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
-#
-# ====================================================================
-#
-# Recent Cyrus versions can use the existing "lmtp" master.cf entry.
-#
-# Specify in cyrus.conf:
-#   lmtp    cmd="lmtpd -a" listen="localhost:lmtp" proto=tcp4
-#
-# Specify in main.cf one or more of the following:
-#  mailbox_transport = lmtp:inet:localhost
-#  virtual_transport = lmtp:inet:localhost
-#
-# ====================================================================
-#
-# Cyrus 2.1.5 (Amos Gouaux)
-# Also specify in main.cf: cyrus_destination_recipient_limit=1
-#
-#cyrus     unix  -       n       n       -       -       pipe
-#  user=cyrus argv=/cyrus/bin/deliver -e -r ${sender} -m ${extension} ${user}
-#
-# ====================================================================
-# Old example of delivery via Cyrus.
-#
-#old-cyrus unix  -       n       n       -       -       pipe
-#  flags=R user=cyrus argv=/cyrus/bin/deliver -e -m ${extension} ${user}
-#
-# ====================================================================
-#
-# See the Postfix UUCP_README file for configuration details.
-#
-uucp      unix  -       n       n       -       -       pipe
-  flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
-#
-# Other external delivery methods.
-#
-ifmail    unix  -       n       n       -       -       pipe
-  flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
-bsmtp     unix  -       n       n       -       -       pipe
-  flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
-scalemail-backend unix  -       n       n       -       2       pipe
-  flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
-mailman   unix  -       n       n       -       -       pipe
-  flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
-  ${nexthop} ${user}
+lmtp      unix  -       -       n       -       -       lmtp
+anvil     unix  -       -       n       -       1       anvil
+scache    unix  -       -       n       -       1       scache
+submission-header-cleanup unix n - n    -       0       cleanup
+    -o header_checks=regexp:/etc/postfix/submission_header_cleanup
 
+
+
+
+
+
+#--OLD-->#
+#--OLD--># Postfix master process configuration file.  For details on the format
+#--OLD--># of the file, see the master(5) manual page (command: "man 5 master" or
+#--OLD--># on-line: http://www.postfix.org/master.5.html).
+#--OLD-->#
+#--OLD--># Do not forget to execute "postfix reload" after editing this file.
+#--OLD-->#
+#--OLD--># ==========================================================================
+#--OLD--># service type  private unpriv  chroot  wakeup  maxproc command + args
+#--OLD-->#               (yes)   (yes)   (yes)   (never) (100)
+#--OLD--># ==========================================================================
+#--OLD-->smtp      inet  n       -       -       -       -       smtpd
+#--OLD-->#smtp      inet  n       -       -       -       1       postscreen
+#--OLD-->#smtpd     pass  -       -       -       -       -       smtpd
+#--OLD-->#dnsblog   unix  -       -       -       -       0       dnsblog
+#--OLD-->#tlsproxy  unix  -       -       -       -       0       tlsproxy
+#--OLD-->#submission inet n       -       -       -       -       smtpd
+#--OLD-->#  -o syslog_name=postfix/submission
+#--OLD-->#  -o smtpd_tls_security_level=encrypt
+#--OLD-->#  -o smtpd_sasl_auth_enable=yes
+#--OLD-->#  -o smtpd_reject_unlisted_recipient=no
+#--OLD-->#  -o smtpd_client_restrictions=$mua_client_restrictions
+#--OLD-->#  -o smtpd_helo_restrictions=$mua_helo_restrictions
+#--OLD-->#  -o smtpd_sender_restrictions=$mua_sender_restrictions
+#--OLD-->#  -o smtpd_recipient_restrictions=
+#--OLD-->#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+#--OLD-->#  -o milter_macro_daemon_name=ORIGINATING
+#--OLD-->smtps     inet  n       -       -       -       -       smtpd
+#--OLD-->  -o syslog_name=postfix/smtps
+#--OLD-->  -o smtpd_tls_wrappermode=yes
+#--OLD-->  -o smtpd_sasl_auth_enable=yes
+#--OLD-->  -o smtpd_reject_unlisted_recipient=no
+#--OLD-->  -o smtpd_client_restrictions=$mua_client_restrictions
+#--OLD-->  -o smtpd_helo_restrictions=$mua_helo_restrictions
+#--OLD-->  -o smtpd_sender_restrictions=$mua_sender_restrictions
+#--OLD-->  -o smtpd_recipient_restrictions=
+#--OLD-->  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+#--OLD-->  -o milter_macro_daemon_name=ORIGINATING
+#--OLD-->#628       inet  n       -       -       -       -       qmqpd
+#--OLD-->pickup    unix  n       -       -       60      1       pickup
+#--OLD-->cleanup   unix  n       -       -       -       0       cleanup
+#--OLD-->qmgr      unix  n       -       n       300     1       qmgr
+#--OLD-->#qmgr     unix  n       -       n       300     1       oqmgr
+#--OLD-->tlsmgr    unix  -       -       -       1000?   1       tlsmgr
+#--OLD-->rewrite   unix  -       -       -       -       -       trivial-rewrite
+#--OLD-->bounce    unix  -       -       -       -       0       bounce
+#--OLD-->defer     unix  -       -       -       -       0       bounce
+#--OLD-->trace     unix  -       -       -       -       0       bounce
+#--OLD-->verify    unix  -       -       -       -       1       verify
+#--OLD-->flush     unix  n       -       -       1000?   0       flush
+#--OLD-->proxymap  unix  -       -       n       -       -       proxymap
+#--OLD-->proxywrite unix -       -       n       -       1       proxymap
+#--OLD-->smtp      unix  -       -       -       -       -       smtp
+#--OLD-->relay     unix  -       -       -       -       -       smtp
+#--OLD-->#       -o smtp_helo_timeout=5 -o smtp_connect_timeout=5
+#--OLD-->showq     unix  n       -       -       -       -       showq
+#--OLD-->error     unix  -       -       -       -       -       error
+#--OLD-->retry     unix  -       -       -       -       -       error
+#--OLD-->discard   unix  -       -       -       -       -       discard
+#--OLD-->local     unix  -       n       n       -       -       local
+#--OLD-->virtual   unix  -       n       n       -       -       virtual
+#--OLD-->lmtp      unix  -       -       -       -       -       lmtp
+#--OLD-->anvil     unix  -       -       -       -       1       anvil
+#--OLD-->scache    unix  -       -       -       -       1       scache
+#--OLD-->#
+#--OLD--># ====================================================================
+#--OLD--># Interfaces to non-Postfix software. Be sure to examine the manual
+#--OLD--># pages of the non-Postfix software to find out what options it wants.
+#--OLD-->#
+#--OLD--># Many of the following services use the Postfix pipe(8) delivery
+#--OLD--># agent.  See the pipe(8) man page for information about ${recipient}
+#--OLD--># and other message envelope options.
+#--OLD--># ====================================================================
+#--OLD-->#
+#--OLD--># maildrop. See the Postfix MAILDROP_README file for details.
+#--OLD--># Also specify in main.cf: maildrop_destination_recipient_limit=1
+#--OLD-->#
+#--OLD-->maildrop  unix  -       n       n       -       -       pipe
+#--OLD-->  flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
+#--OLD-->#
+#--OLD--># ====================================================================
+#--OLD-->#
+#--OLD--># Recent Cyrus versions can use the existing "lmtp" master.cf entry.
+#--OLD-->#
+#--OLD--># Specify in cyrus.conf:
+#--OLD-->#   lmtp    cmd="lmtpd -a" listen="localhost:lmtp" proto=tcp4
+#--OLD-->#
+#--OLD--># Specify in main.cf one or more of the following:
+#--OLD-->#  mailbox_transport = lmtp:inet:localhost
+#--OLD-->#  virtual_transport = lmtp:inet:localhost
+#--OLD-->#
+#--OLD--># ====================================================================
+#--OLD-->#
+#--OLD--># Cyrus 2.1.5 (Amos Gouaux)
+#--OLD--># Also specify in main.cf: cyrus_destination_recipient_limit=1
+#--OLD-->#
+#--OLD-->#cyrus     unix  -       n       n       -       -       pipe
+#--OLD-->#  user=cyrus argv=/cyrus/bin/deliver -e -r ${sender} -m ${extension} ${user}
+#--OLD-->#
+#--OLD--># ====================================================================
+#--OLD--># Old example of delivery via Cyrus.
+#--OLD-->#
+#--OLD-->#old-cyrus unix  -       n       n       -       -       pipe
+#--OLD-->#  flags=R user=cyrus argv=/cyrus/bin/deliver -e -m ${extension} ${user}
+#--OLD-->#
+#--OLD--># ====================================================================
+#--OLD-->#
+#--OLD--># See the Postfix UUCP_README file for configuration details.
+#--OLD-->#
+#--OLD-->uucp      unix  -       n       n       -       -       pipe
+#--OLD-->  flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
+#--OLD-->#
+#--OLD--># Other external delivery methods.
+#--OLD-->#
+#--OLD-->ifmail    unix  -       n       n       -       -       pipe
+#--OLD-->  flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
+#--OLD-->bsmtp     unix  -       n       n       -       -       pipe
+#--OLD-->  flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
+#--OLD-->scalemail-backend unix  -       n       n       -       2       pipe
+#--OLD-->  flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
+#--OLD-->mailman   unix  -       n       n       -       -       pipe
+#--OLD-->  flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
+#--OLD-->  ${nexthop} ${user}
+#--OLD-->
