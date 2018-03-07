@@ -47,4 +47,9 @@ master.cf:
      -o smtpd_sasl_auth_enable=yes
 	...
 
+DOVECOT
+-------
+1. > apt-get install dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-sieve dovecot-managesieved dovecot-antispam
+2. > rm -r /etc/dovecot/*
+
 

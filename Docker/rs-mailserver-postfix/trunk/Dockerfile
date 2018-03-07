@@ -1,8 +1,13 @@
 FROM debian
 MAINTAINER Ralph Schuster <github@ralph-schuster.eu>
 
+RUN debconf-set-selections << "postfix postfix/mailname string mail.example.com" 
+RUN debconf-set-selections << "postfix postfix/main_mailer_type string 'Internet Site'"
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postfix \
+    postfix postfix-mysql \
+    dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved dovecot-antispam \
     mailutils \
 	vim \
     rsyslog \
@@ -10,16 +15,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     telnet \
     && rm -rf /var/lib/apt/lists/*
 
-RUN rm -f /etc/postfix/main.cf /etc/postfix/master.cf /etc/aliases
+RUN rm -rf /etc/postfix/* /etc/aliases /etc/dovecot/*
 
 RUN mkdir /usr/local/rs-mailserver \
     && mkdir /usr/local/rs-mailserver/bin \
-    && mkdir /usr/local/rs-mailserver/postfix
+    && mkdir /usr/local/rs-mailserver/postfix \
+    && mkdir /usr/local/rs-mailserver/dovecot \
+    && mkdir /var/vmail \
+    && mkdir /var/vmail/sieve \
+    && mkdir /var/vmail/sieve/global \
+    && mkdir /etc/postfix/sql 
+
 
 COPY src/bin/* /usr/local/rs-mailserver/bin/
 COPY src/postfix/* /usr/local/rs-mailserver/postfix/
+COPY src/dovecot/* /usr/local/rs-mailserver/dovecot/
+COPY src/sieve/* /var/vmail/sieve/global/
 
-RUN chmod 755 /usr/local/rs-mailserver/bin/*
+RUN touch /etc/postfix/postscreen_access \
+    && touch /etc/postfix/without_ptr \
+    && adduser --gecos --disabled-login --disabled-password --home /var/vmail vmail \
+    && chmod 755 /usr/local/rs-mailserver/bin/* \
+    && chown vmail:vmail /usr/local/rs-mailserver/bin/spampipe.sh \
+    && mkdir /var/vmail/mailboxes \
+    && mkdir -p /var/vmail/sieve/global \
+    && chown -R vmail:vmail /var/vmail \
+    && chmod -R 770 /var/vmail
 
 WORKDIR /usr/local/rs-mailserver/bin
 CMD ["/usr/local/rs-mailserver/bin/exec-server.sh"]
