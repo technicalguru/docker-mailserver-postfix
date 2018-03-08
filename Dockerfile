@@ -26,10 +26,10 @@ RUN mkdir /usr/local/rs-mailserver \
     && mkdir /var/vmail/sieve/global 
 
 
-COPY src/bin/* /usr/local/rs-mailserver/bin/
-COPY src/postfix/* /usr/local/rs-mailserver/postfix/
-COPY src/dovecot/* /usr/local/rs-mailserver/dovecot/
-COPY src/sieve/* /var/vmail/sieve/global/
+ADD src/bin/ /usr/local/rs-mailserver/bin/
+ADD src/postfix/ /usr/local/rs-mailserver/postfix/
+ADD src/dovecot/ /usr/local/rs-mailserver/dovecot/
+ADD src/sieve/ /var/vmail/sieve/global/
 
 RUN touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
