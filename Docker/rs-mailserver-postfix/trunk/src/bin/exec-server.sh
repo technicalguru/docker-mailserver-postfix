@@ -49,34 +49,35 @@ if [[ -z "${PF_DB_PASS}" ]]; then
 fi
 
 replace_var() {
-	sed -i "s/__$2__/$$2/g" $1
+	VARNAME=$2
+	sed -i "s~__$2__~${!VARNAME}~g" $1
 }
 
 copy_template_file() {
 	TMP_SRC=$1
     TMP_DST=$2
 
-	if [ ! -f $TEMP_DST ]; then
-		cp $TEMP_SRC $TEMP_DST
-		replace_var $TEMP_DST 'PF_MYDOMAIN'
-		replace_var $TEMP_DST 'PF_MYHOSTNAME'
-		replace_var $TEMP_DST 'PF_MYORIGIN'
-		replace_var $TEMP_DST 'PF_TLS_CERT_FILE'
-		replace_var $TEMP_DST 'PF_TLS_KEY_FILE'
+	if [ ! -f $TMP_DST ]; then
+		cp $TMP_SRC $TMP_DST
+		replace_var $TMP_DST 'PF_MYDOMAIN'
+		replace_var $TMP_DST 'PF_MYHOSTNAME'
+		replace_var $TMP_DST 'PF_MYORIGIN'
+		replace_var $TMP_DST 'PF_TLS_CERT_FILE'
+		replace_var $TMP_DST 'PF_TLS_KEY_FILE'
 		if [ ! -f $PF_TLS_CAFILE ]; then
-			sed -i "s/^.*PF_TLS_CAFILE/# PF_TLS_CAFILE does not exist/g" $TEMP_DST
+			sed -i "s/^.*PF_TLS_CAFILE/# PF_TLS_CAFILE does not exist/g" $TMP_DST
 		else
-			replace_var $TEMP_DST 'PF_TLS_CAFILE'
+			replace_var $TMP_DST 'PF_TLS_CAFILE'
 		fi
 		if [ ! -f $PF_TLS_CAPATH ]; then
-			sed -i "s/^.*PF_TLS_CAPATH/# PF_TLS_CAPATH does not exist/g" $TEMP_DST
+			sed -i "s/^.*PF_TLS_CAPATH/# PF_TLS_CAPATH does not exist/g" $TMP_DST
 		else
-			replace_var $TEMP_DST 'PF_TLS_CAPATH'
+			replace_var $TMP_DST 'PF_TLS_CAPATH'
 		fi
-		replace_var $TEMP_DST 'PF_DB_HOST'
-		replace_var $TEMP_DST 'PF_DB_NAME'
-		replace_var $TEMP_DST 'PF_DB_USER'
-		replace_var $TEMP_DST 'PF_DB_PASS'
+		replace_var $TMP_DST 'PF_DB_HOST'
+		replace_var $TMP_DST 'PF_DB_NAME'
+		replace_var $TMP_DST 'PF_DB_USER'
+		replace_var $TMP_DST 'PF_DB_PASS'
 	fi
 }
 
@@ -87,7 +88,7 @@ configure_postfix() {
 	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
 
 	# ALIASES
-	#copy_template_file '/usr/local/rs-mailserver/postfix/aliases' '/etc/aliases'
+	copy_template_file '/usr/local/rs-mailserver/postfix/aliases' '/etc/aliases'
 
 	# DOVECOT
 	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot.conf' '/etc/dovecot/dovecot.conf'
@@ -102,7 +103,7 @@ configure_postfix() {
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
 	chmod -R 660 /etc/postfix/sql
 
-    #postmap /etc/postfix/without_ptr 
+    postmap /etc/postfix/without_ptr 
 	newaliases
 }
 
