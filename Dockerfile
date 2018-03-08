@@ -23,8 +23,7 @@ RUN mkdir /usr/local/rs-mailserver \
     && mkdir /usr/local/rs-mailserver/dovecot \
     && mkdir /var/vmail \
     && mkdir /var/vmail/sieve \
-    && mkdir /var/vmail/sieve/global \
-    && mkdir /etc/postfix/sql 
+    && mkdir /var/vmail/sieve/global 
 
 
 COPY src/bin/* /usr/local/rs-mailserver/bin/
