@@ -85,6 +85,7 @@ configure_postfix() {
 	# POSTFIX
 	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/master.cf' '/etc/postfix/master.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/dynamicmaps.cf' '/etc/postfix/dynamicmaps.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
 
 	# ALIASES

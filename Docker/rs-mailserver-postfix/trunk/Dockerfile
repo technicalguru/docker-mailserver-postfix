@@ -40,6 +40,7 @@ RUN touch /etc/postfix/postscreen_access \
     && chmod 755 /usr/local/rs-mailserver/bin/* \
     && chown vmail:vmail /usr/local/rs-mailserver/bin/spampipe.sh \
     && mkdir /var/vmail/mailboxes \
+    && mkdir /etc/postfix/sql \
     && mkdir -p /var/vmail/sieve/global \
     && chown -R vmail:vmail /var/vmail \
     && chmod -R 770 /var/vmail
