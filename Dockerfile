@@ -21,6 +21,7 @@ RUN mkdir /usr/local/rs-mailserver \
     && mkdir /usr/local/rs-mailserver/bin \
     && mkdir /usr/local/rs-mailserver/postfix \
     && mkdir /usr/local/rs-mailserver/dovecot \
+    && mkdir /usr/local/rs-mailserver/sql \
     && mkdir /var/vmail \
     && mkdir /var/vmail/sieve \
     && mkdir /var/vmail/sieve/global 
@@ -29,6 +30,7 @@ RUN mkdir /usr/local/rs-mailserver \
 ADD src/bin/ /usr/local/rs-mailserver/bin/
 ADD src/postfix/ /usr/local/rs-mailserver/postfix/
 ADD src/dovecot/ /usr/local/rs-mailserver/dovecot/
+ADD src/sql/ /usr/local/rs-mailserver/sql/
 ADD src/sieve/ /var/vmail/sieve/global/
 
 RUN touch /etc/postfix/postscreen_access \
