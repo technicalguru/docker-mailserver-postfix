@@ -33,8 +33,8 @@ copy_template_file() {
 	fi
 }
 
-copy_template_file '/usr/local/rs-mailserver/postfix/sql/tables.template' '/usr/local/rs-mailserver/postfix/sql/tables.sql'
+copy_template_file '/usr/local/rs-mailserver/sql/tables.template' '/usr/local/rs-mailserver/sql/tables.sql'
 
-cat /usr/local/rs-mailserver/postfix/sql/tables.sql
+cat /usr/local/rs-mailserver/sql/tables.sql
 
 
