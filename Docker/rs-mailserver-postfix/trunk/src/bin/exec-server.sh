@@ -239,6 +239,12 @@ function get_state {
 service rsyslog start
 configure_postfix
 configure_instance -
+# TODO insert into domains (domain) values ('mysystems.tld');
+service dovecot start
+#service amavisd-new start
+#service amavisd-milter start
+service opendkim start
+
 /usr/sbin/postfix quiet-quick-start
 
 
