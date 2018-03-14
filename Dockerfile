@@ -14,15 +14,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsyslog \
     dnsutils \
     telnet \
+    opendkim opendkim-tools \
     && rm -rf /var/lib/apt/lists/*
 
-RUN rm -rf /etc/postfix/* /etc/aliases /etc/dovecot/*
+RUN rm -rf /etc/postfix/* /etc/aliases /etc/dovecot/* /etc/opendkim.conf
 
 RUN mkdir /usr/local/rs-mailserver \
     && mkdir /usr/local/rs-mailserver/bin \
     && mkdir /usr/local/rs-mailserver/postfix \
     && mkdir /usr/local/rs-mailserver/dovecot \
     && mkdir /usr/local/rs-mailserver/sql \
+    && mkdir /etc/postfix/sql \
+    && mkdir /etc/opendkim \
+    && mkdir /etc/opendkim/keys \
     && mkdir /var/vmail \
     && mkdir /var/vmail/sieve \
     && mkdir /var/vmail/sieve/global 
@@ -33,6 +37,9 @@ ADD src/postfix/ /usr/local/rs-mailserver/postfix/
 ADD src/dovecot/ /usr/local/rs-mailserver/dovecot/
 ADD src/sql/ /usr/local/rs-mailserver/sql/
 ADD src/sieve/ /var/vmail/sieve/global/
+ADD src/opendkim/opendkim.conf /etc/
+ADD src/opendkim/keytable /etc/
+ADD src/opendkim/signingtable /etc/
 
 RUN touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
@@ -40,10 +47,13 @@ RUN touch /etc/postfix/postscreen_access \
     && chmod 755 /usr/local/rs-mailserver/bin/* \
     && chown vmail:vmail /usr/local/rs-mailserver/bin/spampipe.sh \
     && mkdir /var/vmail/mailboxes \
-    && mkdir /etc/postfix/sql \
     && mkdir -p /var/vmail/sieve/global \
     && chown -R vmail:vmail /var/vmail \
-    && chmod -R 770 /var/vmail
+    && chmod -R 770 /var/vmail \
+    && cd /etc/opendkim \
+    && opendkim-genkey --selector=key1 --bits=2048 --directory=keys \
+    && chown opendkim /etc/opendkim/keys/key1.private \
+    && usermod -aG opendkim postfix
 
 WORKDIR /usr/local/rs-mailserver/bin
 CMD ["/usr/local/rs-mailserver/bin/exec-server.sh"]
