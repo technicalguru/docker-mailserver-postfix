@@ -50,14 +50,19 @@ fi
 
 replace_var() {
 	VARNAME=$2
-	sed -i "s~__$2__~${!VARNAME}~g" $1
+	VARVALUE=${!VARNAME}
+	sed -i "s:__${VARNAME}__:${VARVALUE}:g" $1
 }
 
 copy_template_file() {
 	TMP_SRC=$1
-    TMP_DST=$2
+	TMP_DST=$2
 
 	if [ ! -f $TMP_DST ]; then
+		if [ ! -f $TMP_SRC ]; then
+			echo "Cannot find $TMP_SRC"
+			exit 1
+		fi
 		cp $TMP_SRC $TMP_DST
 		replace_var $TMP_DST 'PF_MYDOMAIN'
 		replace_var $TMP_DST 'PF_MYHOSTNAME'
@@ -79,12 +84,16 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_DB_USER'
 		replace_var $TMP_DST 'PF_DB_PASS'
 	fi
+	if [ ! -f $TMP_DST ]; then
+		echo "Cannot create $TMP_DST"
+		exit 1
+	fi
 }
 
 configure_postfix() {
 	# POSTFIX
-	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/master.cf' '/etc/postfix/master.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/dynamicmaps.cf' '/etc/postfix/dynamicmaps.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
 
@@ -104,12 +113,12 @@ configure_postfix() {
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
 	chmod -R 660 /etc/postfix/sql
 
-    postmap /etc/postfix/without_ptr 
+	postmap /etc/postfix/without_ptr 
 	newaliases
 }
 
 configure_instance() {
-    INSTANCE="$1"
+	INSTANCE="$1"
     if [ "X$INSTANCE" = X ]; then
             POSTCONF="postconf"
     else
@@ -233,23 +242,18 @@ configure_instance() {
 }
 
 function get_state {
-    echo $(script -c 'postfix status' | grep postfix/postfix-script)
+	echo $(script -c 'postfix status' | grep postfix/postfix-script)
 }
 
 service rsyslog start
 configure_postfix
-configure_instance -
-# TODO insert into domains (domain) values ('mysystems.tld');
-service dovecot start
-#service amavisd-new start
-#service amavisd-milter start
-service opendkim start
+#configure_instance -
+#/usr/sbin/postfix quiet-quick-start
 
-/usr/sbin/postfix quiet-quick-start
-
+exit 0;
 
 while true; do
-    state=$(get_state)
+	state=$(get_state)
     if [[ "$state" != "${state/is running/}" ]]; then
         PID=${state//[^0-9]/}
         if [[ -z $PID ]]; then

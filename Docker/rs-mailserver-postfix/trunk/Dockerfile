@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:buster
 MAINTAINER Ralph Schuster <github@ralph-schuster.eu>
 
 RUN debconf-set-selections << "postfix postfix/mailname string mail.example.com" 
@@ -32,14 +32,10 @@ RUN mkdir /usr/local/rs-mailserver \
     && mkdir /var/vmail/sieve/global 
 
 
-ADD src/bin/ /usr/local/rs-mailserver/bin/
-ADD src/postfix/ /usr/local/rs-mailserver/postfix/
-ADD src/dovecot/ /usr/local/rs-mailserver/dovecot/
-ADD src/sql/ /usr/local/rs-mailserver/sql/
-ADD src/sieve/ /var/vmail/sieve/global/
-ADD src/opendkim/opendkim.conf /etc/
-ADD src/opendkim/keytable /etc/
-ADD src/opendkim/signingtable /etc/
+COPY src/bin/ /usr/local/rs-mailserver/bin/
+COPY src/postfix/ /usr/local/rs-mailserver/postfix/
+COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
+COPY src/sieve/ /var/vmail/sieve/global/
 
 RUN touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
