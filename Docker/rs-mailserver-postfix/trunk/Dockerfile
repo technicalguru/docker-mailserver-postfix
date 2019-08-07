@@ -1,12 +1,13 @@
 FROM debian:buster
 MAINTAINER Ralph Schuster <github@ralph-schuster.eu>
 
-RUN debconf-set-selections << "postfix postfix/mailname string mail.example.com" 
-RUN debconf-set-selections << "postfix postfix/main_mailer_type string 'Internet Site'"
-ARG DEBIAN_FRONTEND=noninteractive
+RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
+RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends \
     default-mysql-client \
+    apt-utils \
+    procps \
     postfix postfix-mysql \
     dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved dovecot-antispam \
     mailutils \
@@ -16,8 +17,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     telnet \
     opendkim opendkim-tools \
     && rm -rf /var/lib/apt/lists/*
-
-RUN rm -rf /etc/postfix/* /etc/aliases /etc/dovecot/* /etc/opendkim.conf
 
 RUN mkdir /usr/local/rs-mailserver \
     && mkdir /usr/local/rs-mailserver/bin \
@@ -36,6 +35,8 @@ COPY src/bin/ /usr/local/rs-mailserver/bin/
 COPY src/postfix/ /usr/local/rs-mailserver/postfix/
 COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
 COPY src/sieve/ /var/vmail/sieve/global/
+
+RUN /usr/local/rs-mailserver/bin/reset-server.sh
 
 RUN touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
