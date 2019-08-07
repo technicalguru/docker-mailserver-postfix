@@ -6,7 +6,7 @@ RUN debconf-set-selections << "postfix postfix/main_mailer_type string 'Internet
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    mysql-client \
+    default-mysql-client \
     postfix postfix-mysql \
     dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved dovecot-antispam \
     mailutils \
