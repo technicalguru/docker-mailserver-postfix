@@ -37,6 +37,7 @@ COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
 COPY src/sieve/ /var/vmail/sieve/global/
 
 RUN chmod 755 /usr/local/rs-mailserver/bin/* \
+    && sync \
     && /usr/local/rs-mailserver/bin/reset-server.sh \
     && touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
