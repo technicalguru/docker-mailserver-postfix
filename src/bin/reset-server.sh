@@ -19,3 +19,6 @@ rm /etc/postfix/sql/domains.cf
 rm /etc/postfix/sql/recipient-access.cf 
 rm /etc/postfix/sql/sender-login-maps.cf 
 rm /etc/postfix/sql/tls-policy.cf 
+
+exit 0
+
