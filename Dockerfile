@@ -36,12 +36,11 @@ COPY src/postfix/ /usr/local/rs-mailserver/postfix/
 COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
 COPY src/sieve/ /var/vmail/sieve/global/
 
-RUN /usr/local/rs-mailserver/bin/reset-server.sh
-
-RUN touch /etc/postfix/postscreen_access \
+RUN chmod 755 /usr/local/rs-mailserver/bin/* \
+    && /usr/local/rs-mailserver/bin/reset-server.sh \
+    && touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
     && adduser --gecos --disabled-login --disabled-password --home /var/vmail vmail \
-    && chmod 755 /usr/local/rs-mailserver/bin/* \
     && chown vmail:vmail /usr/local/rs-mailserver/bin/spampipe.sh \
     && mkdir /var/vmail/mailboxes \
     && mkdir -p /var/vmail/sieve/global \
