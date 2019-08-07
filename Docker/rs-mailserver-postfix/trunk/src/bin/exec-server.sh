@@ -247,10 +247,8 @@ function get_state {
 
 service rsyslog start
 configure_postfix
-#configure_instance -
-#/usr/sbin/postfix quiet-quick-start
-
-exit 0;
+configure_instance -
+/usr/sbin/postfix quiet-quick-start
 
 while true; do
 	state=$(get_state)
