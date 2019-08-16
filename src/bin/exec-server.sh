@@ -105,9 +105,12 @@ configure_postfix() {
 	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot-sql.conf' '/etc/dovecot/dovecot-sql.conf'
 
 	# SQL CONFIGS
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/accounts.cf' '/etc/postfix/sql/accounts.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/aliases.cf' '/etc/postfix/sql/aliases.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/domains.cf' '/etc/postfix/sql/domains.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/aliases.cf' '/etc/postfix/sql/aliases.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains.cf' '/etc/postfix/sql/alias_domains.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains_catchall.cf' '/etc/postfix/sql/alias_domains_catchall.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/accounts.cf' '/etc/postfix/sql/accounts.cf'
+	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_accounts.cf' '/etc/postfix/sql/alias_accounts.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/recipient-access.cf' '/etc/postfix/sql/recipient-access.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/sender-login-maps.cf' '/etc/postfix/sql/sender-login-maps.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'

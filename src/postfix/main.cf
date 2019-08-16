@@ -76,7 +76,8 @@ relayhost =
 smtpd_recipient_restrictions = check_recipient_access mysql:/etc/postfix/sql/recipient-access.cf
 
 ### CLIENTS
-smtpd_client_restrictions = permit_mynetworks check_client_access hash:/etc/postfix/without_ptr reject_unknown_client_hostname 
+smtpd_client_restrictions = permit_mynetworks check_client_access hash:/etc/postfix/without_ptr
+#reject_unknown_client_hostname 
 
 ### HELO
 smtpd_helo_required = yes
@@ -109,9 +110,18 @@ postscreen_dnsbl_action = drop
 ##
 ## MySQL CONFIG
 ##
-virtual_alias_maps = mysql:/etc/postfix/sql/aliases.cf
-virtual_mailbox_maps = mysql:/etc/postfix/sql/accounts.cf
-virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
+#virtual_alias_maps = mysql:/etc/postfix/sql/aliases.cf
+#virtual_mailbox_maps = mysql:/etc/postfix/sql/accounts.cf
+#virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
+
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/sql/domains.cf
+virtual_alias_maps =
+   proxy:mysql:/etc/postfix/sql/aliases.cf,
+   proxy:mysql:/etc/postfix/sql/alias_domains.cf,
+   proxy:mysql:/etc/postfix/sql/alias_domains_catchall.cf
+virtual_mailbox_maps =
+   proxy:mysql:/etc/postfix/sql/accounts.cf,
+   proxy:mysql:/etc/postfix/sql/alias_accounts.cf
 local_recipient_maps = $virtual_mailbox_maps
 
 
