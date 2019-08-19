@@ -48,6 +48,14 @@ smtpd_tls_key_file = __PF_TLS_KEY_FILE__
 smtpd_tls_CAfile = __PF_TLS_CAFILE__
 smtpd_tls_CApath = __PF_TLS_CAPATH__
 
+##
+## SASL Authentication
+##
+#smtpd_sasl_auth_enable = yes
+#smtpd_sasl_type = dovecot
+#smtpd_sasl_path = private/auth
+#smtpd_sasl_security_options = noanonymous,noplaintext
+
 
 ##
 ## LOCAL MAIL DELIVERY
