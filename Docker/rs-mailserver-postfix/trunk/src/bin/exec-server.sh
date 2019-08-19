@@ -251,7 +251,9 @@ function get_state {
 service rsyslog start
 configure_postfix
 configure_instance -
+postconf compatibility_level=2
 /usr/sbin/postfix quiet-quick-start
+service dovecot start
 
 while true; do
 	state=$(get_state)
