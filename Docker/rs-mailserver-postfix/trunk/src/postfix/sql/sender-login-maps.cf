@@ -2,4 +2,4 @@ user = __PF_DB_USER__
 password = __PF_DB_PASS__
 hosts = __PF_DB_HOST__
 dbname = __PF_DB_NAME__
-query = select concat(username, '@', domain) as 'owns' from mailbox where username = '%u' AND domain = '%d' and active = '1' union select goto AS 'owns' from alias where address = '%s' and active = '1';
+query = select username as 'owns' from mailbox where username = '%u' AND domain = '%d' and active = '1' union select goto AS 'owns' from alias where address = '%s' and active = '1';
