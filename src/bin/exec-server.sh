@@ -245,7 +245,7 @@ configure_instance() {
 }
 
 function get_state {
-	$(script -c 'postfix status' | grep postfix/postfix-script)
+	echo $(script -c 'postfix status' | grep postfix/postfix-script)
 }
 
 service rsyslog start
