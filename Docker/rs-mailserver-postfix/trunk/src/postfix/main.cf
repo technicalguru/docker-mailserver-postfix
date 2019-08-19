@@ -6,6 +6,7 @@ inet_interfaces = all
 myhostname = __PF_MYHOSTNAME__
 myorigin = __PF_MYORIGIN__
 mydomain = __PF_MYDOMAIN__
+mydestination = localdomain
 
 
 ##
