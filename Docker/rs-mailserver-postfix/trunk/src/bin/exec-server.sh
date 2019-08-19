@@ -245,7 +245,7 @@ configure_instance() {
 }
 
 function get_state {
-	return $(script -c 'postfix status' | grep postfix/postfix-script)
+	$(script -c 'postfix status' | grep postfix/postfix-script)
 }
 
 service rsyslog start
@@ -270,6 +270,6 @@ while true; do
         echo "Postfix is not running."
         break
     fi
-	sleep 5
+	sleep 60
 done
 
