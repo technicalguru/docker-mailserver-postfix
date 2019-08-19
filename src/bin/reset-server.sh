@@ -8,8 +8,8 @@ unset TZ
 
 test -f /etc/default/postfix && . /etc/default/postfix
 
-rm /etc/postfix/master.cf 
-rm /etc/postfix/main.cf 
+mv /etc/postfix/master.cf /etc/postfix/master.cf.bak
+mv /etc/postfix/main.cf /etc/postfix/main.cf.bak
 rm /etc/postfix/submission_header_cleanup 
 rm /etc/aliases /etc/dovecot/dovecot.conf 
 rm /etc/dovecot/dovecot-sql.conf 
