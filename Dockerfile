@@ -32,7 +32,7 @@ RUN mkdir /usr/local/rs-mailserver \
 
 
 COPY src/bin/ /usr/local/rs-mailserver/bin/
-COPY src/sql/ /usr/local/rs-mailserver/sql/
+#COPY src/sql/ /usr/local/rs-mailserver/sql/
 COPY src/postfix/ /usr/local/rs-mailserver/postfix/
 COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
 COPY src/sieve/ /var/vmail/sieve/global/
