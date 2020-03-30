@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:10.2
 MAINTAINER Ralph Schuster <github@ralph-schuster.eu>
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
