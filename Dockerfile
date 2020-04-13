@@ -16,6 +16,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     dnsutils \
     telnet \
     opendkim opendkim-tools \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /usr/local/rs-mailserver \
