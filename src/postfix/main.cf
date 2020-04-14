@@ -7,6 +7,7 @@ myhostname = __PF_MYHOSTNAME__
 myorigin = __PF_MYORIGIN__
 mydomain = __PF_MYDOMAIN__
 mydestination = localdomain
+inet_protocols = ipv4
 
 
 ##
@@ -71,8 +72,8 @@ milter_default_action = accept
 milter_protocol = 2
 #smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
 #                unix:/var/run/opendkim/opendkim.sock
-smtpd_milters = unix:/var/run/opendkim/opendkim.sock
-non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+#smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+#non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
 
 ##
 ## SERVER RESTRICTIONS 
@@ -122,7 +123,7 @@ postscreen_dnsbl_action = drop
 ## Amavis content filter
 ##
 ##
-content_filter = amavis:[amavis-service]:10024
+content_filter = amavis:[amavis-service.mailserver-dev.svc.cluster.local]:10024
 receive_override_options = no_address_mappings
 
 ##
@@ -131,7 +132,7 @@ receive_override_options = no_address_mappings
 #virtual_alias_maps = mysql:/etc/postfix/sql/aliases.cf
 #virtual_mailbox_maps = mysql:/etc/postfix/sql/accounts.cf
 #virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
-
+alias_maps = hash:/etc/aliases
 virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
 virtual_alias_maps =
    mysql:/etc/postfix/sql/aliases.cf,
