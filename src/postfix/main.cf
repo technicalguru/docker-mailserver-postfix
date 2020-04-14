@@ -65,12 +65,13 @@ virtual_transport = lmtp:unix:private/dovecot-lmtp
 
 ##
 ## DKIM SIGNATURES
-## MAIL FILTERS (via amavisd-milter)
+## MAIL FILTERS
 ##
 milter_default_action = accept
 milter_protocol = 2
-smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
-                unix:/var/run/opendkim/opendkim.sock
+#smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
+#                unix:/var/run/opendkim/opendkim.sock
+smtpd_milters = unix:/var/run/opendkim/opendkim.sock
 non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
 
 ##
@@ -116,6 +117,13 @@ postscreen_dnsbl_threshold = 2
 postscreen_dnsbl_sites = dnsbl.sorbs.net*1, bl.spamcop.net*1, ix.dnsbl.manitu.net*2, zen.spamhaus.org*2
 postscreen_dnsbl_action = drop
 
+##
+##
+## Amavis content filter
+##
+##
+content_filter = amavis:[amavis-service]:10024
+receive_override_options = no_address_mappings
 
 ##
 ## MySQL CONFIG

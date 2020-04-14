@@ -114,7 +114,7 @@ configure_postfix() {
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/recipient-access.cf' '/etc/postfix/sql/recipient-access.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/sender-login-maps.cf' '/etc/postfix/sql/sender-login-maps.cf'
 	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
-	chmod -R 660 /etc/postfix/sql
+	chmod -R 640 /etc/postfix/sql
 
 	postmap /etc/postfix/without_ptr 
 	newaliases
