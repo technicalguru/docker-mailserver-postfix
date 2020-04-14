@@ -67,6 +67,7 @@ anvil     unix  -       -       n       -       1       anvil
 scache    unix  -       -       n       -       1       scache
 submission-header-cleanup unix n - n    -       0       cleanup
     -o header_checks=regexp:/etc/postfix/submission_header_cleanup
+postlog   unix-dgram n  -       n       -       1       postlogd
 
 
 
