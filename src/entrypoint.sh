@@ -26,9 +26,6 @@ fi
 if [[ -z "${PF_MYORIGIN}" ]]; then
 	PF_MYORIGIN=$PF_MYHOSTNAME
 fi
-if [[ -z "${PF_AMAVIS_SERVICE_NAME}" ]]; then
-	PF_AMAVIS_SERVICE_NAME=127.0.0.1
-fi
 if [[ -z "${PF_AMAVIS_SERVICE_PORT}" ]]; then
 	PF_AMAVIS_SERVICE_NAME=10024
 fi
@@ -66,8 +63,12 @@ fi
 # $2 - Name of variable to be replaced
 # $3 - Value to replace
 replace_var() {
+	# assign vars
 	VARNAME=$2
 	VARVALUE=${!VARNAME}
+	# Sanitize for sed regex
+	VARVALUE="${VARVALUE//:/\\:}"
+	# replace with sed
 	sed -i "s:__${VARNAME}__:${VARVALUE}:g" $1
 }
 
@@ -90,6 +91,7 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_MYDOMAIN'
 		replace_var $TMP_DST 'PF_MYHOSTNAME'
 		replace_var $TMP_DST 'PF_MYORIGIN'
+		replace_var $TMP_DST 'PF_AMAVIS_CONTENT_FILTER'
 		replace_var $TMP_DST 'PF_TLS_CERT_FILE'
 		replace_var $TMP_DST 'PF_TLS_KEY_FILE'
 		if [ ! -f $PF_TLS_CAFILE ]; then
@@ -127,6 +129,16 @@ copy_files() {
 # Configure postfix.
 # Makes sure all postfix config files are in place
 configure_postfix() {
+	# Check the presence of Amavis
+	if [ -z "${PF_AMAVIS_SERVICE_NAME}" ]
+	then
+		# No Amavis configured
+		export PF_AMAVIS_CONTENT_FILTER=""
+	else
+		# Amavis configured
+		export PF_AMAVIS_CONTENT_FILTER="amavis:[${PF_AMAVIS_SERVICE_NAME}]:${PF_AMAVIS_SERVICE_PORT}"
+	fi
+
 	# POSTFIX
 	copy_files $IMAGE_TEMPLATES/postfix /etc/postfix/
 
