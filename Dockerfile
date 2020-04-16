@@ -1,5 +1,5 @@
 FROM debian:10.2
-MAINTAINER Ralph Schuster <github@ralph-schuster.eu>
+LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
@@ -57,6 +57,16 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
     && usermod -aG opendkim postfix
 
 WORKDIR /usr/local/mailserver
+# SMTP Port
+EXPOSE 25
+# IMAP Port
+EXPOSE 143
+# SMTPS Port
+EXPOSE 587
+# IMAPS Port
+EXPOSE 993
+# SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
+EXPOSE 10025
 #CMD ["/usr/local/mailserver/loop.sh"]
 CMD ["/usr/local/mailserver/entrypoint.sh"]
 
