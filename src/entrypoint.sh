@@ -3,6 +3,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 DAEMON=/usr/sbin/postfix
 NAME=Postfix
+IMAGE_HOME=/usr/local/mailserver
+IMAGE_TEMPLATES=$IMAGE_HOME/templates
+
 TZ=
 unset TZ
 
@@ -22,6 +25,12 @@ if [[ -z "${PF_MYHOSTNAME}" ]]; then
 fi
 if [[ -z "${PF_MYORIGIN}" ]]; then
 	PF_MYORIGIN=$PF_MYHOSTNAME
+fi
+if [[ -z "${PF_AMAVIS_SERVICE_NAME}" ]]; then
+	PF_AMAVIS_SERVICE_NAME=127.0.0.1
+fi
+if [[ -z "${PF_AMAVIS_SERVICE_PORT}" ]]; then
+	PF_AMAVIS_SERVICE_NAME=10024
 fi
 if [[ -z "${PF_TLS_CERT_FILE}" ]]; then
 	PF_TLS_CERT_FILE=/etc/ssl/certs/ssl-cert-snakeoil.pem
@@ -48,12 +57,25 @@ if [[ -z "${PF_DB_PASS}" ]]; then
 	PF_DB_PASS=password
 fi
 
+####################
+# Helper functions
+####################
+# Replace a variable ina file
+# Arguments:
+# $1 - file to replace variable in
+# $2 - Name of variable to be replaced
+# $3 - Value to replace
 replace_var() {
 	VARNAME=$2
 	VARVALUE=${!VARNAME}
 	sed -i "s:__${VARNAME}__:${VARVALUE}:g" $1
 }
 
+# Copy a template file and replace all variables in there.
+# The target file will not be touched if it exists before
+# Arguments:
+# $1 - the template file
+# $2 - the destination file
 copy_template_file() {
 	TMP_SRC=$1
 	TMP_DST=$2
@@ -63,6 +85,7 @@ copy_template_file() {
 			echo "Cannot find $TMP_SRC"
 			exit 1
 		fi
+		echo "Creating $TMP_DST from template $TMP_SRC"
 		cp $TMP_SRC $TMP_DST
 		replace_var $TMP_DST 'PF_MYDOMAIN'
 		replace_var $TMP_DST 'PF_MYHOSTNAME'
@@ -90,36 +113,38 @@ copy_template_file() {
 	fi
 }
 
+# Copy template files in a directory to a destination directory
+copy_files() {
+	SRC=$1
+	DST=$2
+	cd $SRC
+	for file in *
+	do
+		copy_template_file $SRC/$file $DST/$file
+	done
+}
+
+# Configure postfix.
+# Makes sure all postfix config files are in place
 configure_postfix() {
 	# POSTFIX
-	copy_template_file '/usr/local/rs-mailserver/postfix/master.cf' '/etc/postfix/master.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/dynamicmaps.cf' '/etc/postfix/dynamicmaps.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
+	copy_files $IMAGE_TEMPLATES/postfix /etc/postfix/
 
 	# ALIASES
-	copy_template_file '/usr/local/rs-mailserver/postfix/aliases' '/etc/aliases'
+	copy_template_file $IMAGE_TEMPLATES/aliases/aliases /etc/aliases
 
 	# DOVECOT
-	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot.conf' '/etc/dovecot/dovecot.conf'
-	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot-sql.conf' '/etc/dovecot/dovecot-sql.conf'
+	copy_files $IMAGE_TEMPLATES/dovecot /etc/dovecot
 
 	# SQL CONFIGS
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/domains.cf' '/etc/postfix/sql/domains.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/aliases.cf' '/etc/postfix/sql/aliases.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains.cf' '/etc/postfix/sql/alias_domains.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains_catchall.cf' '/etc/postfix/sql/alias_domains_catchall.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/accounts.cf' '/etc/postfix/sql/accounts.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_accounts.cf' '/etc/postfix/sql/alias_accounts.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/recipient-access.cf' '/etc/postfix/sql/recipient-access.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/sender-login-maps.cf' '/etc/postfix/sql/sender-login-maps.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
+	copy_files $IMAGE_TEMPLATES/sql /etc/postfix/sql
 	chmod -R 640 /etc/postfix/sql
 
 	postmap /etc/postfix/without_ptr 
 	newaliases
 }
 
+# Make sure that all configurations match for postfix
 configure_instance() {
 	INSTANCE="$1"
     if [ "X$INSTANCE" = X ]; then
@@ -244,32 +269,22 @@ configure_instance() {
     fi
 }
 
-function get_state {
-	echo $(script -c 'postfix status' | grep postfix/postfix-script)
-}
+#########################
+# Startup procedure
+#########################
+cd $IMAGE_HOME
 
+# Start log facility
 service rsyslog start
+
+# Configure postfix
 configure_postfix
 configure_instance -
 postconf compatibility_level=2
-service dovecot start
-/usr/sbin/postfix start-fg
 
-while true; do
-	state=$(get_state)
-    if [[ "$state" != "${state/is running/}" ]]; then
-        PID=${state//[^0-9]/}
-        if [[ -z $PID ]]; then
-            continue
-        fi
-        if [[ ! -d "/proc/$PID" ]]; then
-            echo "Postfix process $PID does not exist."
-            break
-        fi
-    else
-        echo "Postfix is not running."
-        break
-    fi
-	sleep 60
-done
+# Start Dovecot (the mail drop software)
+service dovecot start
+
+# Start Postfix in foreground (for logging purposes)
+/usr/sbin/postfix start-fg
 

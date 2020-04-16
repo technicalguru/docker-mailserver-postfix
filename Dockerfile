@@ -19,11 +19,12 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /usr/local/rs-mailserver \
-    && mkdir /usr/local/rs-mailserver/bin \
-    && mkdir /usr/local/rs-mailserver/postfix \
-    && mkdir /usr/local/rs-mailserver/dovecot \
-    && mkdir /usr/local/rs-mailserver/sql \
+RUN mkdir /usr/local/mailserver \
+    && mkdir /usr/local/mailserver/templates \
+    && mkdir /usr/local/mailserver/templates/postfix \
+    && mkdir /usr/local/mailserver/templates/dovecot \
+    && mkdir /usr/local/mailserver/templates/sql \
+    && mkdir /usr/local/mailserver/templates/aliases \
     && mkdir /etc/postfix/sql \
     && mkdir /etc/opendkim \
     && mkdir /etc/opendkim/keys \
@@ -32,19 +33,20 @@ RUN mkdir /usr/local/rs-mailserver \
     && mkdir /var/vmail/sieve/global 
 
 
-COPY src/bin/ /usr/local/rs-mailserver/bin/
-#COPY src/sql/ /usr/local/rs-mailserver/sql/
-COPY src/postfix/ /usr/local/rs-mailserver/postfix/
-COPY src/dovecot/ /usr/local/rs-mailserver/dovecot/
-COPY src/sieve/ /var/vmail/sieve/global/
+ADD src/ /usr/local/mailserver/
+ADD etc/sql/ /usr/local/mailserver/templates/sql/
+ADD etc/postfix/ /usr/local/mailserver/templates/postfix/
+ADD etc/dovecot/ /usr/local/mailserver/templates/dovecot/
+ADD etc/aliases/ /usr/local/mailserver/templates/aliases/
+ADD etc/sieve/ /var/vmail/sieve/global/
 
-RUN chmod 755 /usr/local/rs-mailserver/bin/* \
+RUN chmod 755 /usr/local/mailserver/*.sh \
     && sync \
-    && /usr/local/rs-mailserver/bin/reset-server.sh \
+    && /usr/local/mailserver/reset-server.sh \
     && touch /etc/postfix/postscreen_access \
     && touch /etc/postfix/without_ptr \
     && adduser --gecos --disabled-login --disabled-password --home /var/vmail vmail \
-    && chown vmail:vmail /usr/local/rs-mailserver/bin/spampipe.sh \
+    && chown vmail:vmail /usr/local/mailserver/spampipe.sh \
     && mkdir /var/vmail/mailboxes \
     && mkdir -p /var/vmail/sieve/global \
     && chown -R vmail:vmail /var/vmail \
@@ -54,5 +56,7 @@ RUN chmod 755 /usr/local/rs-mailserver/bin/* \
     && chown opendkim /etc/opendkim/keys/key1.private \
     && usermod -aG opendkim postfix
 
-WORKDIR /usr/local/rs-mailserver/bin
-CMD ["/usr/local/rs-mailserver/bin/exec-server.sh"]
+WORKDIR /usr/local/mailserver
+#CMD ["/usr/local/mailserver/loop.sh"]
+CMD ["/usr/local/mailserver/entrypoint.sh"]
+

@@ -1,1 +1,1 @@
-docker build -t technicalguru/rs-mailserver-postfix:latest .
+docker build -t technicalguru/mailserver-postfix:latest .

@@ -123,7 +123,7 @@ postscreen_dnsbl_action = drop
 ## Amavis content filter
 ##
 ##
-content_filter = amavis:[amavis-service.mailserver-dev.svc.cluster.local]:10024
+content_filter = amavis:[__PF_AMAVIS_SERVICE_NAME__]:__PF_AMAVIS_SERVICE_PORT__
 receive_override_options = no_address_mappings
 
 ##
