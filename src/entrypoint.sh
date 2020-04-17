@@ -53,6 +53,12 @@ fi
 if [[ -z "${PF_DB_PASS}" ]]; then
 	PF_DB_PASS=password
 fi
+if [ ! -f $PF_TLS_CAFILE ]; then
+	echo "PF_TLS_CAFILE=$PF_TLS_CAFILE: File does not exist" 1>&2
+fi
+if [ ! -d $PF_TLS_CAPATH ]; then
+	echo "PF_TLS_CAPATH=$PF_TLS_CAPATH: Directory does not exist" 1>&2
+fi
 
 ####################
 # Helper functions
@@ -83,7 +89,7 @@ copy_template_file() {
 
 	if [ ! -f $TMP_DST ]; then
 		if [ ! -f $TMP_SRC ]; then
-			echo "Cannot find $TMP_SRC"
+			echo "Cannot find $TMP_SRC" 1>&2
 			exit 1
 		fi
 		echo "Creating $TMP_DST from template $TMP_SRC"
@@ -95,12 +101,12 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_TLS_CERT_FILE'
 		replace_var $TMP_DST 'PF_TLS_KEY_FILE'
 		if [ ! -f $PF_TLS_CAFILE ]; then
-			sed -i "s/^.*PF_TLS_CAFILE/# PF_TLS_CAFILE does not exist/g" $TMP_DST
+			sed -i "s/^.*PF_TLS_CAFILE__/# PF_TLS_CAFILE does not exist/g" $TMP_DST
 		else
 			replace_var $TMP_DST 'PF_TLS_CAFILE'
 		fi
-		if [ ! -f $PF_TLS_CAPATH ]; then
-			sed -i "s/^.*PF_TLS_CAPATH/# PF_TLS_CAPATH does not exist/g" $TMP_DST
+		if [ ! -d $PF_TLS_CAPATH ]; then
+			sed -i "s/^.*PF_TLS_CAPATH__/# PF_TLS_CAPATH does not exist/g" $TMP_DST
 		else
 			replace_var $TMP_DST 'PF_TLS_CAPATH'
 		fi
@@ -110,7 +116,7 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_DB_PASS'
 	fi
 	if [ ! -f $TMP_DST ]; then
-		echo "Cannot create $TMP_DST"
+		echo "Cannot create $TMP_DST" 1>&2
 		exit 1
 	fi
 }
@@ -290,7 +296,7 @@ check_database_user() {
 		echo "CREATE USER '$PF_DB_USER'@'%' IDENTIFIED BY '$PF_DB_PASS';" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
 		if [[ $? -ne 0 ]]
 		then
-			echo "Cannot create user $PF_DB_USER"
+			echo "Cannot create user $PF_DB_USER" 1>&2
 			exit 1
 		fi
 	fi
@@ -301,7 +307,7 @@ create_database() {
 	echo "CREATE DATABASE IF NOT EXISTS $PF_DB_NAME;" |  mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
 	if [[ $? -ne 0 ]]
 	then
-		echo "Cannot create database $PF_DB_NAME"
+		echo "Cannot create database $PF_DB_NAME" 1>&2
 		exit 1
 	fi
 	# Also authorize user now
@@ -309,7 +315,7 @@ create_database() {
 	echo "GRANT ALL PRIVILEGES ON \`$PF_DB_NAME\`.* TO '$PF_DB_USER'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
 	if [[ $? -ne 0 ]]
 	then
-		echo "Cannot grant privileges on database $PF_DB_NAME to user $PF_DB_USER"
+		echo "Cannot grant privileges on database $PF_DB_NAME to user $PF_DB_USER" 1>&2
 		exit 1
 	fi
 	# we need some delay for the privileges to be flushed
@@ -320,7 +326,7 @@ create_tables() {
 	mysql -u $PF_DB_USER --password=$PF_DB_PASS -h $PF_DB_HOST $PF_DB_NAME <$IMAGE_HOME/create_tables.sql
 	if [[ $? -ne 0 ]]
 	then
-		echo "Cannot create tables on database $PF_DB_NAME to user $PF_DB_USER"
+		echo "Cannot create tables on database $PF_DB_NAME to user $PF_DB_USER" 1>&2
 		exit 1
 	fi
 }
@@ -332,7 +338,7 @@ check_database() {
 		# Password not correct or database not initialized
 		if [[ -z "$PF_SETUP_PASS" ]]
 		then
-			echo "Cannot check database setup. Your database denies access. Cannot proceed as there is no setup password provided (PF_SETUP_PASS)"
+			echo "Cannot check database setup. Your database denies access. Cannot proceed as there is no setup password provided (PF_SETUP_PASS)" 1>&2
 			exit 1
 		fi
 
@@ -343,7 +349,7 @@ check_database() {
 		DATABASES=$( echo "show databases like '$PF_DB_NAME';" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST --skip-column-names)
 		if [[ $? -ne 0 ]]
 		then
-			echo "Cannot check database setup. Please check your database setup!"
+			echo "Cannot check database setup. Please check your database setup!" 1>&2
 			exit 1
 		fi
 
