@@ -3,6 +3,9 @@
 PATH=/bin:/usr/bin:/sbin:/usr/sbin
 DAEMON=/usr/sbin/postfix
 NAME=Postfix
+IMAGE_HOME=/usr/local/mailserver
+IMAGE_TEMPLATES=$IMAGE_HOME/templates
+
 TZ=
 unset TZ
 
@@ -22,6 +25,9 @@ if [[ -z "${PF_MYHOSTNAME}" ]]; then
 fi
 if [[ -z "${PF_MYORIGIN}" ]]; then
 	PF_MYORIGIN=$PF_MYHOSTNAME
+fi
+if [[ -z "${PF_AMAVIS_SERVICE_PORT}" ]]; then
+	PF_AMAVIS_SERVICE_NAME=10024
 fi
 if [[ -z "${PF_TLS_CERT_FILE}" ]]; then
 	PF_TLS_CERT_FILE=/etc/ssl/certs/ssl-cert-snakeoil.pem
@@ -47,35 +53,60 @@ fi
 if [[ -z "${PF_DB_PASS}" ]]; then
 	PF_DB_PASS=password
 fi
+if [ ! -f $PF_TLS_CAFILE ]; then
+	echo "PF_TLS_CAFILE=$PF_TLS_CAFILE: File does not exist" 1>&2
+fi
+if [ ! -d $PF_TLS_CAPATH ]; then
+	echo "PF_TLS_CAPATH=$PF_TLS_CAPATH: Directory does not exist" 1>&2
+fi
 
+####################
+# Helper functions
+####################
+# Replace a variable ina file
+# Arguments:
+# $1 - file to replace variable in
+# $2 - Name of variable to be replaced
+# $3 - Value to replace
 replace_var() {
+	# assign vars
 	VARNAME=$2
 	VARVALUE=${!VARNAME}
+	# Sanitize for sed regex
+	VARVALUE="${VARVALUE//:/\\:}"
+	# replace with sed
 	sed -i "s:__${VARNAME}__:${VARVALUE}:g" $1
 }
 
+# Copy a template file and replace all variables in there.
+# The target file will not be touched if it exists before
+# Arguments:
+# $1 - the template file
+# $2 - the destination file
 copy_template_file() {
 	TMP_SRC=$1
 	TMP_DST=$2
 
 	if [ ! -f $TMP_DST ]; then
 		if [ ! -f $TMP_SRC ]; then
-			echo "Cannot find $TMP_SRC"
+			echo "Cannot find $TMP_SRC" 1>&2
 			exit 1
 		fi
+		echo "Creating $TMP_DST from template $TMP_SRC"
 		cp $TMP_SRC $TMP_DST
 		replace_var $TMP_DST 'PF_MYDOMAIN'
 		replace_var $TMP_DST 'PF_MYHOSTNAME'
 		replace_var $TMP_DST 'PF_MYORIGIN'
+		replace_var $TMP_DST 'PF_AMAVIS_CONTENT_FILTER'
 		replace_var $TMP_DST 'PF_TLS_CERT_FILE'
 		replace_var $TMP_DST 'PF_TLS_KEY_FILE'
 		if [ ! -f $PF_TLS_CAFILE ]; then
-			sed -i "s/^.*PF_TLS_CAFILE/# PF_TLS_CAFILE does not exist/g" $TMP_DST
+			sed -i "s/^.*PF_TLS_CAFILE__/# PF_TLS_CAFILE does not exist/g" $TMP_DST
 		else
 			replace_var $TMP_DST 'PF_TLS_CAFILE'
 		fi
-		if [ ! -f $PF_TLS_CAPATH ]; then
-			sed -i "s/^.*PF_TLS_CAPATH/# PF_TLS_CAPATH does not exist/g" $TMP_DST
+		if [ ! -d $PF_TLS_CAPATH ]; then
+			sed -i "s/^.*PF_TLS_CAPATH__/# PF_TLS_CAPATH does not exist/g" $TMP_DST
 		else
 			replace_var $TMP_DST 'PF_TLS_CAPATH'
 		fi
@@ -85,41 +116,53 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_DB_PASS'
 	fi
 	if [ ! -f $TMP_DST ]; then
-		echo "Cannot create $TMP_DST"
+		echo "Cannot create $TMP_DST" 1>&2
 		exit 1
 	fi
 }
 
+# Copy template files in a directory to a destination directory
+copy_files() {
+	SRC=$1
+	DST=$2
+	cd $SRC
+	for file in *
+	do
+		copy_template_file $SRC/$file $DST/$file
+	done
+}
+
+# Configure postfix.
+# Makes sure all postfix config files are in place
 configure_postfix() {
+	# Check the presence of Amavis
+	if [ -z "${PF_AMAVIS_SERVICE_NAME}" ]
+	then
+		# No Amavis configured
+		export PF_AMAVIS_CONTENT_FILTER=""
+	else
+		# Amavis configured
+		export PF_AMAVIS_CONTENT_FILTER="amavis:[${PF_AMAVIS_SERVICE_NAME}]:${PF_AMAVIS_SERVICE_PORT}"
+	fi
+
 	# POSTFIX
-	copy_template_file '/usr/local/rs-mailserver/postfix/master.cf' '/etc/postfix/master.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/main.cf' '/etc/postfix/main.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/dynamicmaps.cf' '/etc/postfix/dynamicmaps.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/submission_header_cleanup' '/etc/postfix/submission_header_cleanup'
+	copy_files $IMAGE_TEMPLATES/postfix /etc/postfix/
 
 	# ALIASES
-	copy_template_file '/usr/local/rs-mailserver/postfix/aliases' '/etc/aliases'
+	copy_template_file $IMAGE_TEMPLATES/aliases/aliases /etc/aliases
 
 	# DOVECOT
-	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot.conf' '/etc/dovecot/dovecot.conf'
-	copy_template_file '/usr/local/rs-mailserver/dovecot/dovecot-sql.conf' '/etc/dovecot/dovecot-sql.conf'
+	copy_files $IMAGE_TEMPLATES/dovecot /etc/dovecot
 
 	# SQL CONFIGS
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/domains.cf' '/etc/postfix/sql/domains.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/aliases.cf' '/etc/postfix/sql/aliases.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains.cf' '/etc/postfix/sql/alias_domains.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_domains_catchall.cf' '/etc/postfix/sql/alias_domains_catchall.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/accounts.cf' '/etc/postfix/sql/accounts.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/alias_accounts.cf' '/etc/postfix/sql/alias_accounts.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/recipient-access.cf' '/etc/postfix/sql/recipient-access.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/sender-login-maps.cf' '/etc/postfix/sql/sender-login-maps.cf'
-	copy_template_file '/usr/local/rs-mailserver/postfix/sql/tls-policy.cf' '/etc/postfix/sql/tls-policy.cf'
-	chmod -R 660 /etc/postfix/sql
+	copy_files $IMAGE_TEMPLATES/sql /etc/postfix/sql
+	chmod -R 640 /etc/postfix/sql
 
 	postmap /etc/postfix/without_ptr 
 	newaliases
 }
 
+# Make sure that all configurations match for postfix
 configure_instance() {
 	INSTANCE="$1"
     if [ "X$INSTANCE" = X ]; then
@@ -244,32 +287,106 @@ configure_instance() {
     fi
 }
 
-function get_state {
-	echo $(script -c 'postfix status' | grep postfix/postfix-script)
+check_database_user() {
+	USER=$( echo "select host,user from mysql.user where user='$PF_DB_USER';" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST --skip-column-names)
+	if [[ -z "$USER" ]]
+	then
+		# Create user
+		echo "Creating user..."
+		echo "CREATE USER '$PF_DB_USER'@'%' IDENTIFIED BY '$PF_DB_PASS';" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
+		if [[ $? -ne 0 ]]
+		then
+			echo "Cannot create user $PF_DB_USER" 1>&2
+			exit 1
+		fi
+	fi
 }
 
+create_database() {
+	echo "Creating database..."
+	echo "CREATE DATABASE IF NOT EXISTS $PF_DB_NAME;" |  mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
+	if [[ $? -ne 0 ]]
+	then
+		echo "Cannot create database $PF_DB_NAME" 1>&2
+		exit 1
+	fi
+	# Also authorize user now
+	echo "Granting privileges..."
+	echo "GRANT ALL PRIVILEGES ON \`$PF_DB_NAME\`.* TO '$PF_DB_USER'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
+	if [[ $? -ne 0 ]]
+	then
+		echo "Cannot grant privileges on database $PF_DB_NAME to user $PF_DB_USER" 1>&2
+		exit 1
+	fi
+	# we need some delay for the privileges to be flushed
+	sleep 2
+}
+
+create_tables() {
+	mysql -u $PF_DB_USER --password=$PF_DB_PASS -h $PF_DB_HOST $PF_DB_NAME <$IMAGE_HOME/create_tables.sql
+	if [[ $? -ne 0 ]]
+	then
+		echo "Cannot create tables on database $PF_DB_NAME to user $PF_DB_USER" 1>&2
+		exit 1
+	fi
+}
+
+check_database() {
+	TABLES=$( echo "show tables;" | mysql -u $PF_DB_USER --password=$PF_DB_PASS -h $PF_DB_HOST --skip-column-names $PF_DB_NAME)
+	if [[ -z "$TABLES" ]]
+	then
+		# Password not correct or database not initialized
+		if [[ -z "$PF_SETUP_PASS" ]]
+		then
+			echo "Cannot check database setup. Your database denies access. Cannot proceed as there is no setup password provided (PF_SETUP_PASS)" 1>&2
+			exit 1
+		fi
+
+		# Make sure that user is created
+		check_database_user
+
+		# Try to list the database
+		DATABASES=$( echo "show databases like '$PF_DB_NAME';" | mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST --skip-column-names)
+		if [[ $? -ne 0 ]]
+		then
+			echo "Cannot check database setup. Please check your database setup!" 1>&2
+			exit 1
+		fi
+
+		# Check that $PF_DB_NAME is in the list of databases
+		if [[ -z "$DATABASES" ]]
+		then
+			# No database yet
+			create_database
+		fi
+
+	fi
+
+	# will only create when not existing yet
+	create_tables
+}
+
+#########################
+# Installation check
+#########################
+check_database
+
+#########################
+# Startup procedure
+#########################
+cd $IMAGE_HOME
+
+# Start log facility
 service rsyslog start
+
+# Configure postfix
 configure_postfix
 configure_instance -
 postconf compatibility_level=2
-/usr/sbin/postfix quiet-quick-start
+
+# Start Dovecot (the mail drop software)
 service dovecot start
 
-while true; do
-	state=$(get_state)
-    if [[ "$state" != "${state/is running/}" ]]; then
-        PID=${state//[^0-9]/}
-        if [[ -z $PID ]]; then
-            continue
-        fi
-        if [[ ! -d "/proc/$PID" ]]; then
-            echo "Postfix process $PID does not exist."
-            break
-        fi
-    else
-        echo "Postfix is not running."
-        break
-    fi
-	sleep 60
-done
+# Start Postfix in foreground (for logging purposes)
+/usr/sbin/postfix start-fg
 

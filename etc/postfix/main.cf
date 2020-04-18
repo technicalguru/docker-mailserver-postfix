@@ -7,6 +7,7 @@ myhostname = __PF_MYHOSTNAME__
 myorigin = __PF_MYORIGIN__
 mydomain = __PF_MYDOMAIN__
 mydestination = localdomain
+inet_protocols = ipv4
 
 
 ##
@@ -65,13 +66,14 @@ virtual_transport = lmtp:unix:private/dovecot-lmtp
 
 ##
 ## DKIM SIGNATURES
-## MAIL FILTERS (via amavisd-milter)
+## MAIL FILTERS
 ##
 milter_default_action = accept
 milter_protocol = 2
-smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
-                unix:/var/run/opendkim/opendkim.sock
-non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+#smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
+#                unix:/var/run/opendkim/opendkim.sock
+#smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+#non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
 
 ##
 ## SERVER RESTRICTIONS 
@@ -116,6 +118,13 @@ postscreen_dnsbl_threshold = 2
 postscreen_dnsbl_sites = dnsbl.sorbs.net*1, bl.spamcop.net*1, ix.dnsbl.manitu.net*2, zen.spamhaus.org*2
 postscreen_dnsbl_action = drop
 
+##
+##
+## Amavis content filter
+##
+##
+content_filter = __PF_AMAVIS_CONTENT_FILTER__
+receive_override_options = no_address_mappings
 
 ##
 ## MySQL CONFIG
@@ -123,7 +132,7 @@ postscreen_dnsbl_action = drop
 #virtual_alias_maps = mysql:/etc/postfix/sql/aliases.cf
 #virtual_mailbox_maps = mysql:/etc/postfix/sql/accounts.cf
 #virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
-
+alias_maps = hash:/etc/aliases
 virtual_mailbox_domains = mysql:/etc/postfix/sql/domains.cf
 virtual_alias_maps =
    mysql:/etc/postfix/sql/aliases.cf,
@@ -160,3 +169,5 @@ smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 ### README
 readme_directory = no
 
+### Logging to stdout
+maillog_file = /dev/stdout
