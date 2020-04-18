@@ -153,6 +153,7 @@ configure_postfix() {
 
 	# DOVECOT
 	copy_files $IMAGE_TEMPLATES/dovecot /etc/dovecot
+	copy_files $IMAGE_TEMPLATES/dovecot-conf-d /etc/dovecot/conf.d
 
 	# SQL CONFIGS
 	copy_files $IMAGE_TEMPLATES/sql /etc/postfix/sql
