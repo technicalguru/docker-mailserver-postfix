@@ -19,6 +19,9 @@ for file in *; do mv /etc/postfix/sql/$file /etc/postfix/sql/$file.bak 2>/dev/nu
 cd $IMAGE_TEMPLATES/dovecot
 for file in *; do mv /etc/dovecot/$file /etc/dovecot/$file.bak 2>/dev/null; done
 
+cd $IMAGE_TEMPLATES/dovecot-conf-d
+for file in *; do mv /etc/dovecot/conf.d/$file /etc/dovecot/conf.d/$file.bak 2>/dev/null; done
+
 mv /etc/aliases /etc/aliases.bak 
 
 exit 0

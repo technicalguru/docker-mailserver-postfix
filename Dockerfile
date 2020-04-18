@@ -23,6 +23,7 @@ RUN mkdir /usr/local/mailserver \
     && mkdir /usr/local/mailserver/templates \
     && mkdir /usr/local/mailserver/templates/postfix \
     && mkdir /usr/local/mailserver/templates/dovecot \
+    && mkdir /usr/local/mailserver/templates/dovecot-conf-d \
     && mkdir /usr/local/mailserver/templates/sql \
     && mkdir /usr/local/mailserver/templates/aliases \
     && mkdir /etc/postfix/sql \
@@ -37,6 +38,7 @@ ADD src/ /usr/local/mailserver/
 ADD etc/sql/ /usr/local/mailserver/templates/sql/
 ADD etc/postfix/ /usr/local/mailserver/templates/postfix/
 ADD etc/dovecot/ /usr/local/mailserver/templates/dovecot/
+ADD etc/dovecot-conf-d/ /usr/local/mailserver/templates/dovecot-conf-d/
 ADD etc/aliases/ /usr/local/mailserver/templates/aliases/
 ADD etc/sieve/ /var/vmail/sieve/global/
 
@@ -67,6 +69,6 @@ EXPOSE 587
 EXPOSE 993
 # SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
 EXPOSE 10025
-#CMD ["/usr/local/mailserver/loop.sh"]
-CMD ["/usr/local/mailserver/entrypoint.sh"]
+CMD ["/usr/local/mailserver/loop.sh"]
+#CMD ["/usr/local/mailserver/entrypoint.sh"]
 
