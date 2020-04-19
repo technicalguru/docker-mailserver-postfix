@@ -24,23 +24,22 @@ RUN mkdir /usr/local/mailserver \
     && mkdir /usr/local/mailserver/templates/postfix \
     && mkdir /usr/local/mailserver/templates/dovecot \
     && mkdir /usr/local/mailserver/templates/dovecot-conf-d \
+    && mkdir /usr/local/mailserver/templates/sieve \
     && mkdir /usr/local/mailserver/templates/sql \
     && mkdir /usr/local/mailserver/templates/aliases \
     && mkdir /etc/postfix/sql \
     && mkdir /etc/opendkim \
     && mkdir /etc/opendkim/keys \
-    && mkdir /var/vmail \
-    && mkdir /var/vmail/sieve \
-    && mkdir /var/vmail/sieve/global 
+    && mkdir /var/vmail 
 
 
 ADD src/ /usr/local/mailserver/
-ADD etc/sql/ /usr/local/mailserver/templates/sql/
 ADD etc/postfix/ /usr/local/mailserver/templates/postfix/
 ADD etc/dovecot/ /usr/local/mailserver/templates/dovecot/
 ADD etc/dovecot-conf-d/ /usr/local/mailserver/templates/dovecot-conf-d/
+ADD etc/sieve/ /usr/local/mailserver/templates/sieve/
 ADD etc/aliases/ /usr/local/mailserver/templates/aliases/
-ADD etc/sieve/ /var/vmail/sieve/global/
+ADD etc/sql/ /usr/local/mailserver/templates/sql/
 
 RUN chmod 755 /usr/local/mailserver/*.sh \
     && sync \
@@ -50,7 +49,6 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
     && adduser --gecos --disabled-login --disabled-password --home /var/vmail vmail \
     && chown vmail:vmail /usr/local/mailserver/spampipe.sh \
     && mkdir /var/vmail/mailboxes \
-    && mkdir -p /var/vmail/sieve/global \
     && chown -R vmail:vmail /var/vmail \
     && chmod -R 770 /var/vmail \
     && cd /etc/opendkim \

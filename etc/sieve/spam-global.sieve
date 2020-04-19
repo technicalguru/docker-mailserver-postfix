@@ -1,5 +1,6 @@
-require "fileinto";
+require ["fileinto","mailbox"];
+
 if header :contains "X-Spam-Flag" "YES" {
-  fileinto "Spam";
+  fileinto :create "Spam";
 }
 

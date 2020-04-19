@@ -367,6 +367,22 @@ check_database() {
 	create_tables
 }
 
+configure_sieve() {
+	if [ ! -d /var/vmail/sieve ]
+	then
+		mkdir /var/vmail/sieve
+	fi
+	if [ ! -d /var/vmail/global ]
+	then
+		mkdir /var/vmail/sieve/global
+	fi
+	if [ ! -f /var/vmail/sieve/global/spam-global.sieve ]
+	then
+		cp $IMAGE_TEMPLATES/sieve/spam-global.sieve /var/vmail/sieve/global/spam-global.sieve
+	fi
+	chown -R vmail:vmail /var/vmail/sieve
+}
+
 #########################
 # Installation check
 #########################
@@ -379,6 +395,9 @@ cd $IMAGE_HOME
 
 # Start log facility
 service rsyslog start
+
+# Configure Sieve rule
+configure_sieve
 
 # Configure postfix
 configure_postfix
