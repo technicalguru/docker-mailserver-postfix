@@ -383,6 +383,15 @@ configure_sieve() {
 	chown -R vmail:vmail /var/vmail/sieve
 }
 
+# Stopping all (we got a TERM signal at this point)
+_sigterm() {
+	echo "Caught SIGTERM..."
+	/usr/sbin/postfix stop
+	service dovecot stop
+	service rsyslog stop
+	kill -TERM "$TAIL_CHILD_PID" 2>/dev/null
+}
+
 #########################
 # Installation check
 #########################
@@ -408,5 +417,13 @@ postconf compatibility_level=2
 service dovecot start
 
 # Start Postfix in foreground (for logging purposes)
-/usr/sbin/postfix start-fg
+/usr/sbin/postfix start
+
+# Tail the mail.log
+trap _sigterm SIGTERM
+
+tail -f /var/log/mail.log &
+TAIL_CHILD_PID=$!
+wait "$TAIL_CHILD_PID"
+
 

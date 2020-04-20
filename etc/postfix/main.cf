@@ -170,4 +170,4 @@ smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 readme_directory = no
 
 ### Logging to stdout
-maillog_file = /dev/stdout
+#maillog_file = /dev/stdout
