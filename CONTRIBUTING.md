@@ -15,14 +15,9 @@ The following is a set of guidelines for contributing to mailserver and its pack
 [How Can I Contribute?](#how-can-i-contribute)
   * [Reporting Bugs](#reporting-bugs)
   * [Suggesting Enhancements](#suggesting-enhancements)
-  * [Your First Code Contribution](#your-first-code-contribution)
-  * [Pull Requests](#pull-requests)
 
 [Styleguides](#styleguides)
   * [Git Commit Messages](#git-commit-messages)
-  * [JavaScript Styleguide](#javascript-styleguide)
-  * [CoffeeScript Styleguide](#coffeescript-styleguide)
-  * [Specs Styleguide](#specs-styleguide)
   * [Documentation Styleguide](#documentation-styleguide)
 
 [Additional Notes](#additional-notes)
@@ -38,7 +33,7 @@ The following is a set of guidelines for contributing to mailserver and its pack
 
 Mailserver is an open source project &mdash; it's made up of [5 repositories](https://github.com/technicalguru?tab=repositories&q=docker-mailserver&type=&language=). When you initially consider contributing to Mailserver, you might be unsure about which of those 5 repositories implements the functionality you want to change or report a bug for. This section should help you with that.
 
-Mailserver is intentionally modular. Its main mail-related functions are separated which come from a package. Here's a list:
+Mailserver is intentionally modular. Its main mail-related functions are separated which come from individual packages. Here's a list:
 
 * [docker-mailserver](https://github.com/technicalguru/docker-mailserver) - Provides help, guidance and examples how to orchestrate the Docker images
 * [docker-mailserver-postfix](https://github.com/technicalguru/docker-mailserver-postfix) - Implements the core mailing functionality to send and receive messages.
@@ -48,7 +43,7 @@ Mailserver is intentionally modular. Its main mail-related functions are separat
 
 ### Design Decisions
 
-When a significant decision in how to maintain the project and what can or cannot be supported, it will be documented it in the [docker/docker-mailserver repository](https://github.com/technicalguru/docker-mailserver). If you have a question around how to do things, check to see if it is documented there. If it is *not* documented there, please open a new issue there.
+When a significant decision is taken in how to maintain the project and what can or cannot be supported, it will be documented it in the [technicalguru/docker-mailserver repository](https://github.com/technicalguru/docker-mailserver). If you have a question around how to do things, check to see if it is documented there. If it is *not* documented there, please open a new issue there.
 
 ## How Can I Contribute?
 
@@ -92,6 +87,9 @@ Include details about your configuration and environment:
 * **Are you running Mailserver in a Kubernetes cluster?** If so, which Kubernetes version are you using and which Ingress controller and network plugin are installed?
 * **Are you using custom configuration files?** If so, provide the contents of those files, preferably in a [code block](https://help.github.com/articles/markdown-basics/#multiple-lines) or with a link to a [gist](https://gist.github.com/).
 
+> **Attention!** Do not include any password or secret in your issue description or its attachments. Blank them out as `******` or replace them by `mypassword` instead.
+
+
 ### Suggesting Enhancements
 
 This section guides you through submitting an enhancement suggestion for Mailserver, including completely new features and minor improvements to existing functionality. Following these guidelines helps to understand your suggestion :pencil: and find related suggestions :mag_right:.
@@ -115,8 +113,6 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 * **List some other mailserver implementation and configurations where this enhancement exists.**
 * **Specify which version of Mailserver you're using.** You can get the exact versions by checking out the Docker image tags, e.g. running `docker ps --format "{{.ID}}: {{.Image}}"|grep mailserver` in your terminal, or - for Kubernetes - `kubectl get pods --all-namespaces -o yaml|grep "image: technicalguru/mailserver"`.
 * **Are you running Mailserver in a Kubernetes cluster?** If so, which Kubernetes version are you using and which Ingress controller and network plugin are installed?
-
-### Your First Code Contribution
 
 ## Styleguides
 
@@ -146,7 +142,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 
 ### Documentation Styleguide
 
-* Use [Markdown](https://daringfireball.net/projects/markdown).
+Use the [Markdown](https://daringfireball.net/projects/markdown) syntax for documentation files.
 
 ## Additional Notes
 
@@ -164,7 +160,7 @@ Please open an issue on `technicalguru/docker-mailserver` if you have suggestion
 
 | Label name | Search :mag_right: | Description |
 | --- | --- | --- |
-| `enhancement` | | [search][search-mailserver-label-enhancement] | Feature requests. |
+| `enhancement` | [search][search-mailserver-label-enhancement] | Feature requests. |
 | `bug` | [search][search-mailserver-label-bug] | Confirmed bugs or reports that are very likely to be bugs. |
 | `question` | [search][search-mailserver-label-question] | Questions more than bug reports or feature requests (e.g. how do I do X). |
 | `feedback` | [search][search-mailserver-label-feedback] | General feedback more than bug reports or feature requests. |
@@ -177,7 +173,7 @@ Please open an issue on `technicalguru/docker-mailserver` if you have suggestion
 | `wontfix` | [search][search-mailserver-label-wontfix] | The maintainer has decided not to fix these issues for now, either because they're working as intended or for some other reason. |
 | `invalid` | [search][search-mailserver-label-invalid] | Issues which aren't valid (e.g. user errors). |
 | `package-idea` | [search][search-mailserver-label-package-idea] | Feature request which might be good candidates for new packages, instead of extending Mailserver packages. |
-| `wrong-repo` | | [search][search-mailserver-label-wrong-repo] | Issues reported on the wrong repository. |
+| `wrong-repo` | [search][search-mailserver-label-wrong-repo] | Issues reported on the wrong repository. |
 
 #### Topic Categories
 
