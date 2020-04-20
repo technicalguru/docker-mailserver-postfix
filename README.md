@@ -55,7 +55,10 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
 
 ## Volumes
-You need to provide a data volume in order to secure your mailboxes from data loss. Map the volume to `/var/vmails` folder inside the container.
+You need to provide data volumes in order to secure your mailboxes from data loss. 
+
+* `/var/vmails` is required to persist e-mails that are locally delievered to a mailbox
+* `/var/spool/postfix` is required to hold e-mails that are currently in transmission (Postfix mail queues). Ensure that it is writable for all at startup so Postfix, Dovecot and syslog can create their directories. Afterwards you can reduce the permissions to user-writable only.
 
 Additional volumes are required to map your TLS certificate into the container.
 
