@@ -20,6 +20,8 @@ The following versions are available from DockerHub. The image tag matches the P
 * Standard SMTP and IMAP ports
 * TLS encryption (optional)
 * AntiVirus and AntiSpam integration (optional)
+* Moves spam into Spam folder of your mailbox automatically (when spam recognition is on)
+* User-specific sieve rules enabled
 
 # License
 _docker-mailserver-postfix_  is licensed under [GNU LGPL 3.0](LICENSE.md). As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
@@ -100,5 +102,5 @@ This Docker image is mature and replaced my own mailserver in production. Howeve
 * [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
 
 # Contribution
-Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues).
+Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues). Make sure you have checked out the [Contribution Guideline](CONTRIBUTING.md)
 

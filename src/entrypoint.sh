@@ -159,6 +159,14 @@ configure_postfix() {
 	copy_files $IMAGE_TEMPLATES/sql /etc/postfix/sql
 	chmod -R 640 /etc/postfix/sql
 
+	# Generate the EDH parameters
+	cd /etc/postfix
+	openssl dhparam -out dh512.tmp 512 && mv dh512.tmp dh512.pem
+	openssl dhparam -out dh1024.tmp 1024 && mv dh1024.tmp dh1024.pem
+	openssl dhparam -out dh2048.tmp 2048 && mv dh2048.tmp dh2048.pem
+	chmod 644 dh512.pem dh1024.pem dh2048.pem
+	cd $IMAGE_HOME
+
 	postmap /etc/postfix/without_ptr 
 	newaliases
 }
@@ -383,6 +391,15 @@ configure_sieve() {
 	chown -R vmail:vmail /var/vmail/sieve
 }
 
+# Stopping all (we got a TERM signal at this point)
+_sigterm() {
+	echo "Caught SIGTERM..."
+	/usr/sbin/postfix stop
+	service dovecot stop
+	service rsyslog stop
+	kill -TERM "$TAIL_CHILD_PID" 2>/dev/null
+}
+
 #########################
 # Installation check
 #########################
@@ -408,5 +425,13 @@ postconf compatibility_level=2
 service dovecot start
 
 # Start Postfix in foreground (for logging purposes)
-/usr/sbin/postfix start-fg
+/usr/sbin/postfix start
+
+# Tail the mail.log
+trap _sigterm SIGTERM
+
+tail -f /var/log/mail.log &
+TAIL_CHILD_PID=$!
+wait "$TAIL_CHILD_PID"
+
 
