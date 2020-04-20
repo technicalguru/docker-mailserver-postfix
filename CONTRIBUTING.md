@@ -1,4 +1,4 @@
-# Contributing to mailserver-postfix
+# Contributing to Mailserver Project
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
