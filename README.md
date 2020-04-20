@@ -97,10 +97,17 @@ You can further customize `main.cf`, `master.cf` and other Postfix configuration
 1. Provide your customized file(s) back into the appropriate template folder at `/usr/local/mailserver/templates` by using volume mappings.
 1. (Re)Start the container. If you configuration was not copied correctly then log into the container (bash is available) and issue `/usr/local/mailserver/reset-server.sh`. Then restart again.
 
+# Testing your Mailserver
+
+Here are some useful links that help you to test whether your new Mailserver works as intended and no security flaws are introduced:
+
+* [**Relay Test**](http://www.aupads.org/test-relay.html) - checks whether your mailserver can be misused as an open mail gateway (relay)
+* [**TLS Test**](https://www.checktls.com/) - checks whether your TLS configuration is complete and works as intended
+* [**SMTP Test**](https://mxtoolbox.com/diagnostic.aspx) - A general mailserver diagnostic tool
+
 # Issues
 This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
 
-* [#1](https://github.com/technicalguru/docker-mailserver-postfix/issues/1) - Logging to stdout is showing Postfix log only. Dovecot and other logs are still not showing up.
 * [#2](https://github.com/technicalguru/docker-mailserver-postfix/issues/2) - DKIM support is missing
 * [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
 
