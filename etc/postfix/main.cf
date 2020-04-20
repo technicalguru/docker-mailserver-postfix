@@ -42,7 +42,8 @@ smtpd_tls_security_level = may
 smtpd_tls_auth_only = yes
 smtpd_tls_protocols = !SSLv2, !SSLv3
 smtpd_tls_ciphers = high
-smtpd_tls_dh1024_param_file = /etc/myssl/dh2048.pem
+smtpd_tls_dh1024_param_file = ${config_directory}/dh2048.pem
+smtpd_tls_dh512_param_file = ${config_directory}/dh512.pem
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtpd_tls_cert_file = __PF_TLS_CERT_FILE__
 smtpd_tls_key_file = __PF_TLS_KEY_FILE__
@@ -169,5 +170,9 @@ smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 ### README
 readme_directory = no
 
-### Logging to stdout
+### Logging
+smtp_tls_loglevel = 1
+smtpd_tls_loglevel = 1
+smtpd_tls_received_header = yes
+
 #maillog_file = /dev/stdout

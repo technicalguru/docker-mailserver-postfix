@@ -26,6 +26,7 @@ tlsproxy  unix  -       -       n       -       0       tlsproxy
 ###
 submission inet n       -       n       -       -       smtpd
     -o syslog_name=postfix/submission
+    -o smtpd_tls_dh1024_param_file=${config_directory}/dh1024.pem
     -o smtpd_tls_security_level=encrypt
     -o smtpd_sasl_auth_enable=yes
     -o smtpd_sasl_type=dovecot
