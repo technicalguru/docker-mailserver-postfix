@@ -376,13 +376,9 @@ check_database() {
 }
 
 configure_sieve() {
-	if [ ! -d /var/vmail/sieve ]
+	if [ ! -d /var/vmail/sieve/global ]
 	then
-		mkdir /var/vmail/sieve
-	fi
-	if [ ! -d /var/vmail/global ]
-	then
-		mkdir /var/vmail/sieve/global
+		mkdir --parent /var/vmail/sieve/global
 	fi
 	if [ ! -f /var/vmail/sieve/global/spam-global.sieve ]
 	then
