@@ -66,7 +66,7 @@ ARG ARG_VERSION=3.4.8-01
 ARG ARG_REVISION
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
-ARG ARG_DESCRIPTION=Provides Postfix/Dovecot MTA/MDA based on Debian with MySQL backend
+ARG ARG_DESCRIPTION="Provides Postfix/Dovecot MTA/MDA based on Debian with MySQL backend"
 ARG ARG_DOCUMENTATION=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_AUTHORS=technicalguru
 ARG ARG_LICENSES=GPL-3.0-or-later
