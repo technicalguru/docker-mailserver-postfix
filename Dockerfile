@@ -1,32 +1,6 @@
 FROM debian:10.3
 LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 
-ARG ARG_CREATED
-ARG ARG_URL
-ARG ARG_SOURCE
-ARG ARG_VERSION
-ARG ARG_REVISION
-ARG ARG_VENDOR
-ARG ARG_TITLE
-ARG ARG_DESCRIPTION
-ARG ARG_DOCUMENTATION
-ARG ARG_AUTHORS
-ARG ARG_LICENSES
-ARG ARG_REF_NAME
-
-LABEL org.opencontainers.image.created=$ARG_CREATED
-LABEL org.opencontainers.image.url=$ARG_URL
-LABEL org.opencontainers.image.source=$ARG_SOURCE
-LABEL org.opencontainers.image.version=$ARG_VERSION
-LABEL org.opencontainers.image.revision=$ARG_REVISION
-LABEL org.opencontainers.image.vendor=$ARG_VENDOR
-LABEL org.opencontainers.image.title=$ARG_TITLE
-LABEL org.opencontainers.image.description=$ARG_DESCRIPTION
-LABEL org.opencontainers.image.documentation=$ARG_DOCUMENTATION
-LABEL org.opencontainers.image.authors=$ARG_AUTHORS
-LABEL org.opencontainers.image.licenses=$ARG_LICENSES
-LABEL org.opencontainers.image.ref.name=$ARG_REF_NAME
-
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
@@ -82,6 +56,36 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
     && chown opendkim /etc/opendkim/keys/key1.private \
     && usermod -aG opendkim postfix
 
+#####################################################################
+#  Image OCI labels
+#####################################################################
+ARG ARG_CREATED
+ARG ARG_URL
+ARG ARG_SOURCE
+ARG ARG_VERSION
+ARG ARG_REVISION
+ARG ARG_VENDOR
+ARG ARG_TITLE
+ARG ARG_DESCRIPTION
+ARG ARG_DOCUMENTATION
+ARG ARG_AUTHORS
+ARG ARG_LICENSES
+
+LABEL org.opencontainers.image.created=$ARG_CREATED
+LABEL org.opencontainers.image.url=$ARG_URL
+LABEL org.opencontainers.image.source=$ARG_SOURCE
+LABEL org.opencontainers.image.version=$ARG_VERSION
+LABEL org.opencontainers.image.revision=$ARG_REVISION
+LABEL org.opencontainers.image.vendor=$ARG_VENDOR
+LABEL org.opencontainers.image.title=$ARG_TITLE
+LABEL org.opencontainers.image.description=$ARG_DESCRIPTION
+LABEL org.opencontainers.image.documentation=$ARG_DOCUMENTATION
+LABEL org.opencontainers.image.authors=$ARG_AUTHORS
+LABEL org.opencontainers.image.licenses=$ARG_LICENSES
+
+#####################################################################
+#  Running the container
+#####################################################################
 WORKDIR /usr/local/mailserver
 # SMTP Port
 EXPOSE 25
