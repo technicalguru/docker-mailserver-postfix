@@ -454,11 +454,11 @@ Subject: Postfix TLS certificate expires within 10 days
 
 Hello Postmaster,
 
-the TLS certificate at $PF_MYDOMAIN is about to expire within 10 days.
+the TLS certificate at $PF_MYHOSTNAME is about to expire within 10 days.
 Please renew it.
 
 _____
-This message was automatically sent from Mailserver Postfix system at $PF_MYDOMAIN.
+This message was automatically sent from Mailserver Postfix system at $PF_MYHOSTNAME.
 .
 
 EOM
