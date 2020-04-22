@@ -59,6 +59,9 @@ fi
 if [ ! -d $PF_TLS_CAPATH ]; then
 	echo "PF_TLS_CAPATH=$PF_TLS_CAPATH: Directory does not exist" 1>&2
 fi
+if [[ -z "${PF_TLS_ADMIN_EMAIL}" ]]; then
+	PF_TLS_ADMIN_EMAIL="postmaster\@${PF_MYDOMAIN}"
+fi
 
 ####################
 # Helper functions
@@ -376,13 +379,9 @@ check_database() {
 }
 
 configure_sieve() {
-	if [ ! -d /var/vmail/sieve ]
+	if [ ! -d /var/vmail/sieve/global ]
 	then
-		mkdir /var/vmail/sieve
-	fi
-	if [ ! -d /var/vmail/global ]
-	then
-		mkdir /var/vmail/sieve/global
+		mkdir --parent /var/vmail/sieve/global
 	fi
 	if [ ! -f /var/vmail/sieve/global/spam-global.sieve ]
 	then
@@ -432,6 +431,47 @@ trap _sigterm SIGTERM
 
 tail -f /var/log/mail.log &
 TAIL_CHILD_PID=$!
-wait "$TAIL_CHILD_PID"
+
+if [ -f $PF_TLS_CERT_FILE ]
+then
+	# Entering endless loop for Certificate check every 24 hours
+	INTERVAL=86400
+	COUNTDOWN=0
+	DAYS=10
+	while kill -0 $TAIL_CHILD_PID >/dev/null 2>&1
+	do
+		if [ "$COUNTDOWN" -le 0 ]
+		then
+			echo "Checking TLS certificate..."
+			openssl x509 -checkend $(( 86400 * $DAYS )) -enddate -in "$PF_TLS_CERT_FILE"
+			EXPIRY=$?
+			if [ $EXPIRY -ne 0 ]; then
+				echo "Certificate will expire within 10 days. Sending notification..."
+				sendmail $PF_TLS_ADMIN_EMAIL <<EOM
+To: $PF_TLS_ADMIN_EMAIL
+From: postfix@$PF_MYDOMAIN
+Subject: Postfix TLS certificate expires within 10 days
+
+Hello Postmaster,
+
+the TLS certificate at $PF_MYDOMAIN is about to expire within 10 days.
+Please renew it.
+
+_____
+This message was automatically sent from Mailserver Postfix system at $PF_MYDOMAIN.
+.
+
+EOM
+				echo "Notification sent."
+			fi
+			COUNTDOWN=$INTERVAL
+		fi
+		sleep 1
+		((COUNTDOWN=COUNTDOWN-1))
+	done
+else
+	wait "$TAIL_CHILD_PID"
+fi
+
 
 

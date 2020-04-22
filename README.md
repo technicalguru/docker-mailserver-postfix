@@ -53,9 +53,13 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_TLS_KEY_FILE` | Key file for SSL server certificate. | `/etc/ssl/certs/ssl-cert-snakeoil.key` |
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
+| `PF_TLS_ADMIN_EMAIL` | E-mail address to be notified when TLS certificate is about to expire (10 days) | `postmaster@$PF_MYDOMAIN` |
 
 ## Volumes
-You need to provide a data volume in order to secure your mailboxes from data loss. Map the volume to `/var/vmails` folder inside the container.
+You need to provide data volumes in order to secure your mailboxes from data loss. 
+
+* `/var/vmails` is required to persist e-mails that are locally delievered to a mailbox
+* `/var/spool/postfix` is required to hold e-mails that are currently in transmission (Postfix mail queues). Ensure that it is writable for all at startup so Postfix, Dovecot and syslog can create their directories. Afterwards you can reduce the permissions to user-writable only.
 
 Additional volumes are required to map your TLS certificate into the container.
 
@@ -81,7 +85,7 @@ Once you have started your Postfix container successfully, it is now time to per
 1. Create your first mailbox in this domain
 
 # TLS Configuration
-Only two environment variables are required in order to secure your mailserver by TLS. `PF_TLS_CERT_FILE` and `PF_TLS_KEY_FILE` will ensure that mails can be sent to you in a secure way. However, bear in mind that these certificates expire and that there is currently no automatic check available to warn you about the expiration of this certificate. As these variables hold path names only, it is required to map your certificate files into the running container using volumes.
+Only two environment variables are required in order to secure your mailserver by TLS. `PF_TLS_CERT_FILE` and `PF_TLS_KEY_FILE` will ensure that mails can be sent to you in a secure way. However, bear in mind that these certificates expire. The system checks your TLS certificate every 24 hours and informs you by e-mail about the expiration. As the TLS variables hold path names only, it is required to map your certificate files into the running container using volumes.
 
 You'll need to issue `postconfig reload` after you've changed the certificate. 
 
@@ -94,10 +98,17 @@ You can further customize `main.cf`, `master.cf` and other Postfix configuration
 1. Provide your customized file(s) back into the appropriate template folder at `/usr/local/mailserver/templates` by using volume mappings.
 1. (Re)Start the container. If you configuration was not copied correctly then log into the container (bash is available) and issue `/usr/local/mailserver/reset-server.sh`. Then restart again.
 
+# Testing your Mailserver
+
+Here are some useful links that help you to test whether your new Mailserver works as intended and no security flaws are introduced:
+
+* [**Relay Test**](http://www.aupads.org/test-relay.html) - checks whether your mailserver can be misused as an open mail gateway (relay)
+* [**TLS Test**](https://www.checktls.com/) - checks whether your TLS configuration is complete and works as intended
+* [**SMTP Test**](https://mxtoolbox.com/diagnostic.aspx) - A general mailserver diagnostic tool
+
 # Issues
 This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
 
-* [#1](https://github.com/technicalguru/docker-mailserver-postfix/issues/1) - Logging to stdout is showing Postfix log only. Dovecot and other logs are still not showing up.
 * [#2](https://github.com/technicalguru/docker-mailserver-postfix/issues/2) - DKIM support is missing
 * [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
 
