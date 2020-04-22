@@ -53,6 +53,7 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_TLS_KEY_FILE` | Key file for SSL server certificate. | `/etc/ssl/certs/ssl-cert-snakeoil.key` |
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
+| `PF_TLS_ADMIN_EMAIL` | E-mail address to be notified when TLS certificate is about to expire (10 days) | `postmaster@$PF_MYDOMAIN` |
 
 ## Volumes
 You need to provide data volumes in order to secure your mailboxes from data loss. 
@@ -84,7 +85,7 @@ Once you have started your Postfix container successfully, it is now time to per
 1. Create your first mailbox in this domain
 
 # TLS Configuration
-Only two environment variables are required in order to secure your mailserver by TLS. `PF_TLS_CERT_FILE` and `PF_TLS_KEY_FILE` will ensure that mails can be sent to you in a secure way. However, bear in mind that these certificates expire and that there is currently no automatic check available to warn you about the expiration of this certificate. As these variables hold path names only, it is required to map your certificate files into the running container using volumes.
+Only two environment variables are required in order to secure your mailserver by TLS. `PF_TLS_CERT_FILE` and `PF_TLS_KEY_FILE` will ensure that mails can be sent to you in a secure way. However, bear in mind that these certificates expire. The system checks your TLS certificate every 24 hours and informs you by e-mail about the expiration. As the TLS variables hold path names only, it is required to map your certificate files into the running container using volumes.
 
 You'll need to issue `postconfig reload` after you've changed the certificate. 
 
