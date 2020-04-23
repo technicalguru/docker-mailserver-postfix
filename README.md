@@ -68,7 +68,7 @@ _docker-mailserver-postfix_  exposes 5 ports by default:
 * Port 25 - the traditional SMTP port. This port must be accessible from other hosts to send e-mails to you.
 * Port 587 - the default port nowadays for SMTP. Still, some mail providers do not support them. This port shall be accessible from other hosts.
 * Port 143 - the default port for SMTP authentication and IMAP mail access. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
-* Port 993 - the port for incoming e-mails using IMAP protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
+* Port 995 - the port for incoming e-mails using IMAP protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
 * Port 10025 - a local SMTP delivery port for mails that were checked from Amavis. **Attention!** You need to make sure that this port is not accessible by any other host than your Amavis service because it is not protected and can be used for SPAM attacks.
  
 ## Running the Container

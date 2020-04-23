@@ -94,7 +94,7 @@ EXPOSE 143
 # SMTPS Port
 EXPOSE 587
 # IMAPS Port
-EXPOSE 993
+EXPOSE 995
 # SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
 EXPOSE 10025
 #CMD ["/usr/local/mailserver/loop.sh"]
