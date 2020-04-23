@@ -89,11 +89,15 @@ LABEL org.opencontainers.image.licenses=$ARG_LICENSES
 WORKDIR /usr/local/mailserver
 # SMTP Port
 EXPOSE 25
+# POP3 Port
+EXPOSE 110
 # IMAP Port
 EXPOSE 143
 # SMTPS Port
 EXPOSE 587
 # IMAPS Port
+EXPOSE 993
+# POP3S Port
 EXPOSE 995
 # SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
 EXPOSE 10025
