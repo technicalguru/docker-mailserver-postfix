@@ -116,4 +116,3 @@ This Docker image is mature and replaced my own mailserver in production. Howeve
 
 # Contribution
 Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues). Make sure you have checked out the [Contribution Guideline](CONTRIBUTING.md)
-
