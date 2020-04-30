@@ -13,7 +13,7 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.4.8-01, 3.4.8, 3.4, 3, latest](https://hub.docker.com/repository/docker/technicalguru/mailserver-postfix) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.8-01/Dockerfile)
+* [3.4.8.1, 3.4.8, 3.4, 3, latest](https://hub.docker.com/repository/docker/technicalguru/mailserver-postfix) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.8.1/Dockerfile)
 
 # Features
 * Bootstrap from scratch: See more information below.
