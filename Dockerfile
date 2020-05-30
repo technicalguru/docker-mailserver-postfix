@@ -4,18 +4,30 @@ LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends \
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && PF_VERSION=3.4.10-0+deb10u1 \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
     default-mysql-client \
     apt-utils \
     procps \
-    postfix postfix-mysql \
-    dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved dovecot-antispam \
+    postfix=${PF_VERSION} \
+    postfix-mysql=${PF_VERSION} \
+    dovecot-core \
+    dovecot-imapd \
+    dovecot-pop3d \
+    dovecot-lmtpd \
+    dovecot-mysql \
+    dovecot-sieve \
+    dovecot-managesieved \
+    dovecot-antispam \
     mailutils \
 	vim \
     rsyslog \
     dnsutils \
     telnet \
-    opendkim opendkim-tools \
+    opendkim \
+    opendkim-tools \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -62,7 +74,7 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
 ARG ARG_CREATED
 ARG ARG_URL=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_SOURCE=https://github.com/technicalguru/docker-mailserver-postfix
-ARG ARG_VERSION=3.4.8-01
+ARG ARG_VERSION=3.4.10.0
 ARG ARG_REVISION
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
