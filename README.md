@@ -77,7 +77,7 @@ _docker-mailserver-postfix_  exposes 5 ports by default:
 The [main mailserver project](https://github.com/technicalguru/docker-mailserver) has examples of container configurations:
 * [with docker-compose](https://github.com/technicalguru/docker-mailserver/tree/master/examples/docker-compose)
 * [with Kubernetes YAML files](https://github.com/technicalguru/docker-mailserver/tree/master/examples/kubernetes)
-* [with HELM charts](https://github.com/technicalguru/docker-mailserver/tree/master/helm-charts)
+* [with HELM charts](https://github.com/technicalguru/docker-mailserver/tree/master/examples/helm-charts)
 
 ## Bootstrap and Setup
 Once you have started your Postfix container successfully, it is now time to perform the first-time setup for your mailserver. It is highly recommended to use [docker-mailserver-postfixadmin](https://github.com/technicalguru/docker-mailserver-postfixadmin) for this purpose. However, you can use your own [PostfixAdmin](https://github.com/postfixadmin/postfixadmin) installation.
