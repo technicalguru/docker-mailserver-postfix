@@ -32,6 +32,9 @@ fi
 if [[ -z "${PF_TLS_CERT_FILE}" ]]; then
 	PF_TLS_CERT_FILE=/etc/ssl/certs/ssl-cert-snakeoil.pem
 fi
+if [[ -z "${PF_TLS_CERTCHAIN_FILE}" ]]; then
+	PF_TLS_CERTCHAIN_FILE=${PF_TLS_CERT_FILE}
+fi
 if [[ -z "${PF_TLS_KEY_FILE}" ]]; then
 	PF_TLS_KEY_FILE=/etc/ssl/private/ssl-cert-snakeoil.key
 fi
@@ -102,6 +105,7 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_MYORIGIN'
 		replace_var $TMP_DST 'PF_AMAVIS_CONTENT_FILTER'
 		replace_var $TMP_DST 'PF_TLS_CERT_FILE'
+		replace_var $TMP_DST 'PF_TLS_CERTCHAIN_FILE'
 		replace_var $TMP_DST 'PF_TLS_KEY_FILE'
 		if [ ! -f $PF_TLS_CAFILE ]; then
 			sed -i "s/^.*PF_TLS_CAFILE__/# PF_TLS_CAFILE does not exist/g" $TMP_DST

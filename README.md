@@ -13,7 +13,7 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.4.10.1, 3.4.10, 3.4, 3, latest](https://hub.docker.com/repository/docker/technicalguru/mailserver-postfix) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.10.1/Dockerfile)
+* [3.4.10.2, 3.4.10, 3.4, 3, latest](https://hub.docker.com/repository/docker/technicalguru/mailserver-postfix) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.10.2/Dockerfile)
 
 # Features
 * Bootstrap from scratch: See more information below.
@@ -50,6 +50,7 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_AMAVIS_SERVICE_NAME` | The hostname or IP address of an Amavis instance in order to fight spam and viruses. No AntiSpam and AntiVirus detection takes place when left empty |  |
 | `PF_AMAVIS_SERVICE_PORT` | The port of the Amavis instance. | `10024` |
 | `PF_TLS_CERT_FILE` | SSL server certificate for TLS. | `/etc/ssl/certs/ssl-cert-snakeoil.pem` |
+| `PF_TLS_CERTCHAIN_FILE` | SSL server certificate for TLS including certificate chain. | value of PF\_TLS\_CERT\_FILE |
 | `PF_TLS_KEY_FILE` | Key file for SSL server certificate. | `/etc/ssl/certs/ssl-cert-snakeoil.key` |
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |

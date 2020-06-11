@@ -74,7 +74,7 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
 ARG ARG_CREATED
 ARG ARG_URL=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_SOURCE=https://github.com/technicalguru/docker-mailserver-postfix
-ARG ARG_VERSION=3.4.10.0
+ARG ARG_VERSION=3.4.10.2
 ARG ARG_REVISION
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
