@@ -7,7 +7,7 @@ RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set
 ENV PF_VERSION="3.4.14"
 ENV PF_REVISION="2"
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=3.4.10-0+deb10u1 \
+    && PF_VERSION=3.4.14-0+deb10u1 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \
