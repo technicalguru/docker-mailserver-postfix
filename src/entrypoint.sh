@@ -27,7 +27,10 @@ if [[ -z "${PF_MYORIGIN}" ]]; then
 	PF_MYORIGIN=$PF_MYHOSTNAME
 fi
 if [[ -z "${PF_AMAVIS_SERVICE_PORT}" ]]; then
-	PF_AMAVIS_SERVICE_NAME=10024
+	PF_AMAVIS_SERVICE_PORT=10024
+fi
+if [[ -z "${PF_DKIM_SERVICE_PORT}" ]]; then
+	PF_DKIM_SERVICE_PORT=41001
 fi
 if [[ -z "${PF_TLS_CERT_FILE}" ]]; then
 	PF_TLS_CERT_FILE=/etc/ssl/certs/ssl-cert-snakeoil.pem
@@ -65,7 +68,12 @@ fi
 if [[ -z "${PF_TLS_ADMIN_EMAIL}" ]]; then
 	PF_TLS_ADMIN_EMAIL="postmaster\@${PF_MYDOMAIN}"
 fi
-
+if [[ -z "${PF_ENABLE_UTF8}" ]]; then
+	PF_ENABLE_UTF8=yes
+fi
+if [[ -z "${PF_MILTERS}" ]]; then
+	PF_MILTERS=
+fi
 ####################
 # Helper functions
 ####################
@@ -121,6 +129,8 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_DB_NAME'
 		replace_var $TMP_DST 'PF_DB_USER'
 		replace_var $TMP_DST 'PF_DB_PASS'
+		replace_var $TMP_DST 'PF_ENABLE_UTF8'
+		replace_var $TMP_DST 'PF_MILTERS'
 	fi
 	if [ ! -f $TMP_DST ]; then
 		echo "Cannot create $TMP_DST" 1>&2
@@ -150,6 +160,19 @@ configure_postfix() {
 	else
 		# Amavis configured
 		export PF_AMAVIS_CONTENT_FILTER="amavis:[${PF_AMAVIS_SERVICE_NAME}]:${PF_AMAVIS_SERVICE_PORT}"
+	fi
+
+	# Check the presence of milters and DKIM
+	if [ -z "${PF_MILTERS}" ]
+	then
+		if [ -z "${PF_DKIM_SERVICE_NAME}" ]
+		then
+			# No Milter
+			export PF_MILTERS=""
+		else
+			# Milter 
+			export PF_MILTERS="inet:${PF_DKIM_SERVICE_NAME}:${PF_DKIM_SERVICE_PORT}"
+		fi
 	fi
 
 	# POSTFIX
