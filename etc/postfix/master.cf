@@ -23,11 +23,30 @@ dnsblog   unix  -       -       n       -       0       dnsblog
 tlsproxy  unix  -       -       n       -       0       tlsproxy
 ###
 ### Submission-Zugang für Clients: Für Mailclients gelten andere Regeln, als für andere Mailserver (siehe smtpd_ in main.cf)
+### SMTPS (SSL-Encrypted on transport level)
 ###
-submission inet n       -       n       -       -       smtpd
+smtps inet n       -       n       -       -       smtpd
     -o syslog_name=postfix/submission
     -o smtpd_tls_dh1024_param_file=${config_directory}/dh1024.pem
     -o smtpd_tls_security_level=encrypt
+    -o smtpd_sasl_auth_enable=yes
+    -o smtpd_sasl_type=dovecot
+    -o smtpd_sasl_path=private/auth
+    -o smtpd_sasl_security_options=noanonymous
+    -o smtpd_relay_restrictions=reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_sender_login_maps=mysql:/etc/postfix/sql/sender-login-maps.cf
+    -o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_sender_login_mismatch,permit_sasl_authenticated,reject
+    -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_helo_required=no
+    -o smtpd_helo_restrictions=
+    -o milter_macro_daemon_name=ORIGINATING
+    -o cleanup_service_name=submission-header-cleanup
+###
+### Submission-Zugang für Clients: Für Mailclients gelten andere Regeln, als für andere Mailserver (siehe smtpd_ in main.cf)
+### SMTP with TLSSTART
+###
+submission inet n       -       n       -       -       smtpd
+    -o syslog_name=postfix/submission
     -o smtpd_sasl_auth_enable=yes
     -o smtpd_sasl_type=dovecot
     -o smtpd_sasl_path=private/auth

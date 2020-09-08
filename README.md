@@ -72,7 +72,8 @@ Additional volumes are required to map your TLS certificate into the container.
 _docker-mailserver-postfix_  exposes 5 ports by default:
 * Port 25 - the traditional SMTP port. This port must be accessible from other hosts to send e-mails to you.
 * Port 110 - the port for incoming e-mails using POP3 protocol. You shall not use this port anymore
-* Port 587 - the default port nowadays for SMTP. Still, some mail providers do not support them. This port shall be accessible from other hosts.
+* Port 465 - the default port nowadays for SMTPS. Still, some mail providers do not support them. This port shall be accessible from other hosts.
+* Port 587 - the default port nowadays for SMTP (STARTTLS enabled). Still, some mail providers do not support them. This port shall be accessible from other hosts.
 * Port 143 - the default port for SMTP authentication and IMAP mail access. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
 * Port 993 - the port for incoming e-mails using IMAP protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
 * Port 995 - the port for incoming e-mails using POP3S protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
