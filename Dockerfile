@@ -5,7 +5,7 @@ RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-select
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
 ENV PF_VERSION="3.4.14"
-ENV PF_REVISION="2"
+ENV PF_REVISION="0"
 RUN export DEBIAN_FRONTEND=noninteractive \
     && PF_VERSION=3.4.14-0+deb10u1 \
     && apt-get update \
