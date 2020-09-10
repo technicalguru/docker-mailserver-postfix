@@ -6,6 +6,7 @@ E-Mails itself are stored on file system.
 
 Related images:
 * [docker-mailserver](https://github.com/technicalguru/docker-mailserver) - The main project, containing composition instructions
+* [docker-mailserver-opendkim](https://github.com/technicalguru/docker-mailserver-opendkim) - OpenDKIM image (DKIM signing milter component)
 * [docker-mailserver-postfixadmin](https://github.com/technicalguru/docker-mailserver-postfixadmin) - Image for PostfixAdmin (Web UI to manage mailboxes and domain in Postfix)
 * [docker-mailserver-amavis](https://github.com/technicalguru/docker-mailserver-amavis) - Amavis, ClamAV and SpamAssassin (provides spam and virus detection)
 * [docker-mailserver-roundcube](https://github.com/technicalguru/docker-mailserver-roundcube) - Roundcube Webmailer
@@ -13,7 +14,8 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.4.10.1, 3.4.10, 3.4, 3, latest](https://hub.docker.com/repository/docker/technicalguru/mailserver-postfix) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.10.1/Dockerfile)
+* [3.4.14.0, 3.4.14, 3.4, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
+* [3.4.10.1, 3.4.10](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.10.1) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.10.2/Dockerfile)
 
 # Features
 * Bootstrap from scratch: See more information below.
@@ -49,7 +51,11 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_MYORIGIN` | The domain to be used for local mails (usually name of host). | value of `PF_MYHOSTNAME` |
 | `PF_AMAVIS_SERVICE_NAME` | The hostname or IP address of an Amavis instance in order to fight spam and viruses. No AntiSpam and AntiVirus detection takes place when left empty |  |
 | `PF_AMAVIS_SERVICE_PORT` | The port of the Amavis instance. | `10024` |
+| `PF_MILTERS` | Milters to be configured |  |
+| `PF_DKIM_SERVICE_NAME`| Hostname or IP address of a DKIM service |  |
+| `PF_DKIM_SERVICE_PORT`| Port of a DKIM service | `41001` |
 | `PF_TLS_CERT_FILE` | SSL server certificate for TLS. | `/etc/ssl/certs/ssl-cert-snakeoil.pem` |
+| `PF_TLS_CERTCHAIN_FILE` | SSL server certificate for TLS including certificate chain. | value of PF\_TLS\_CERT\_FILE |
 | `PF_TLS_KEY_FILE` | Key file for SSL server certificate. | `/etc/ssl/certs/ssl-cert-snakeoil.key` |
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
@@ -67,7 +73,8 @@ Additional volumes are required to map your TLS certificate into the container.
 _docker-mailserver-postfix_  exposes 5 ports by default:
 * Port 25 - the traditional SMTP port. This port must be accessible from other hosts to send e-mails to you.
 * Port 110 - the port for incoming e-mails using POP3 protocol. You shall not use this port anymore
-* Port 587 - the default port nowadays for SMTP. Still, some mail providers do not support them. This port shall be accessible from other hosts.
+* Port 465 - the default port nowadays for SMTPS. Still, some mail providers do not support them. This port shall be accessible from other hosts.
+* Port 587 - the default port nowadays for SMTP (STARTTLS enabled). Still, some mail providers do not support them. This port shall be accessible from other hosts.
 * Port 143 - the default port for SMTP authentication and IMAP mail access. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
 * Port 993 - the port for incoming e-mails using IMAP protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
 * Port 995 - the port for incoming e-mails using POP3S protocol. This port must be accessible for your mail agents, e.g. Outlook or Thunderbird.
@@ -111,7 +118,6 @@ Here are some useful links that help you to test whether your new Mailserver wor
 # Issues
 This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
 
-* [#2](https://github.com/technicalguru/docker-mailserver-postfix/issues/2) - DKIM support is missing
 * [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
 
 # Contribution

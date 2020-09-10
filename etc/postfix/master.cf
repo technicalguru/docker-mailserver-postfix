@@ -23,11 +23,32 @@ dnsblog   unix  -       -       n       -       0       dnsblog
 tlsproxy  unix  -       -       n       -       0       tlsproxy
 ###
 ### Submission-Zugang für Clients: Für Mailclients gelten andere Regeln, als für andere Mailserver (siehe smtpd_ in main.cf)
+### SMTPS (SSL-Encrypted on transport level)
+###
+smtps inet n       -       n       -       -       smtpd
+    -o syslog_name=postfix/smtps
+    -o smtpd_tls_dh1024_param_file=${config_directory}/dh1024.pem
+    -o smtpd_tls_security_level=encrypt
+    -o smtpd_sasl_auth_enable=yes
+    -o smtpd_sasl_type=dovecot
+    -o smtpd_sasl_path=private/auth
+    -o smtpd_sasl_security_options=noanonymous
+    -o smtpd_relay_restrictions=reject_non_fqdn_recipient,reject_unknown_recipient_domain,permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_sender_login_maps=mysql:/etc/postfix/sql/sender-login-maps.cf
+    -o smtpd_sender_restrictions=permit_mynetworks,reject_non_fqdn_sender,reject_sender_login_mismatch,permit_sasl_authenticated,reject
+    -o smtpd_client_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+    -o smtpd_helo_required=no
+    -o smtpd_helo_restrictions=
+    -o milter_macro_daemon_name=ORIGINATING
+    -o cleanup_service_name=submission-header-cleanup
+###
+### Submission-Zugang für Clients: Für Mailclients gelten andere Regeln, als für andere Mailserver (siehe smtpd_ in main.cf)
+### SMTP with TLSSTART
 ###
 submission inet n       -       n       -       -       smtpd
     -o syslog_name=postfix/submission
-    -o smtpd_tls_dh1024_param_file=${config_directory}/dh1024.pem
     -o smtpd_tls_security_level=encrypt
+    -o smtpd_sasl_auth_enable=yes
     -o smtpd_sasl_auth_enable=yes
     -o smtpd_sasl_type=dovecot
     -o smtpd_sasl_path=private/auth
@@ -72,21 +93,22 @@ submission-header-cleanup unix n - n    -       0       cleanup
 postlog   unix-dgram n  -       n       -       1       postlogd
 ### Amavis content filter
 amavis    unix  -       -       -       -       2       smtp
+   -o syslog_name=postfix/amavis
    -o smtp_data_done_timeout=1200
    -o smtp_send_xforward_command=yes
 10025     inet  n    -       -       -       -       smtpd
-        -o content_filter=
-        -o local_recipient_maps=
-        -o relay_recipient_maps=
-        -o smtpd_restriction_classes=
-        -o smtpd_client_restrictions=
-        -o smtpd_helo_restrictions=
-        -o smtpd_sender_restrictions=
-        -o smtpd_recipient_restrictions=permit_mynetworks,reject
-        -o mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
-        -o strict_rfc821_envelopes=yes
-        -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
-        #-o smtpd_bind_address=0.0.0.0
+   -o syslog_name=postfix/amavis
+   -o content_filter=
+   -o local_recipient_maps=
+   -o relay_recipient_maps=
+   -o smtpd_restriction_classes=
+   -o smtpd_client_restrictions=
+   -o smtpd_helo_restrictions=
+   -o smtpd_sender_restrictions=
+   -o smtpd_recipient_restrictions=permit_mynetworks,reject
+   -o mynetworks=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+   -o strict_rfc821_envelopes=yes
+   -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
 
 
 

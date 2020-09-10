@@ -71,11 +71,9 @@ virtual_transport = lmtp:unix:private/dovecot-lmtp
 ## MAIL FILTERS
 ##
 milter_default_action = accept
-milter_protocol = 2
-#smtpd_milters = unix:/var/run/amavis/amavisd-milter.sock,
-#                unix:/var/run/opendkim/opendkim.sock
-#smtpd_milters = unix:/var/run/opendkim/opendkim.sock
-#non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+milter_protocol = 6
+smtpd_milters = __PF_MILTERS__
+non_smtpd_milters = $smtpd_milters
 
 ##
 ## SERVER RESTRICTIONS 
@@ -176,3 +174,6 @@ smtpd_tls_loglevel = 1
 smtpd_tls_received_header = yes
 
 #maillog_file = /dev/stdout
+compatibility_level = 2
+smtputf8_enable = __PF_ENABLE_UTF8__
+

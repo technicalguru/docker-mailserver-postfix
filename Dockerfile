@@ -4,8 +4,10 @@ LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
+ENV PF_VERSION="3.4.14"
+ENV PF_REVISION="0"
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=3.4.10-0+deb10u1 \
+    && PF_VERSION=3.4.14-0+deb10u1 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \
@@ -74,8 +76,8 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
 ARG ARG_CREATED
 ARG ARG_URL=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_SOURCE=https://github.com/technicalguru/docker-mailserver-postfix
-ARG ARG_VERSION=3.4.10.0
-ARG ARG_REVISION
+ARG ARG_VERSION="${PF_VERSION}.${PF_REVISION}"
+ARG ARG_REVISION="${PF_REVISION}"
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
 ARG ARG_DESCRIPTION="Provides Postfix/Dovecot MTA/MDA based on Debian with MySQL backend"
