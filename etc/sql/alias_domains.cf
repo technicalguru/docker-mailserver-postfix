@@ -2,4 +2,4 @@ user = __PF_DB_USER__
 password = __PF_DB_PASS__
 hosts = __PF_DB_HOST__
 dbname = __PF_DB_NAME__
-query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '%d' and alias.address = CONCAT('%u', '@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active='1'
+query = SELECT goto FROM alias,alias_domain WHERE alias_domain.alias_domain = '%d' and alias.address = CONCAT('%u', '@', alias_domain.target_domain) AND alias.active = 1 AND alias_domain.active=1
