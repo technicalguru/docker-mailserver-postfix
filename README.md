@@ -6,6 +6,7 @@ E-Mails itself are stored on file system.
 
 Related images:
 * [docker-mailserver](https://github.com/technicalguru/docker-mailserver) - The main project, containing composition instructions
+* [docker-mailserver-opendkim](https://github.com/technicalguru/docker-mailserver-opendkim) - OpenDKIM image (DKIM signing milter component)
 * [docker-mailserver-postfixadmin](https://github.com/technicalguru/docker-mailserver-postfixadmin) - Image for PostfixAdmin (Web UI to manage mailboxes and domain in Postfix)
 * [docker-mailserver-amavis](https://github.com/technicalguru/docker-mailserver-amavis) - Amavis, ClamAV and SpamAssassin (provides spam and virus detection)
 * [docker-mailserver-roundcube](https://github.com/technicalguru/docker-mailserver-roundcube) - Roundcube Webmailer
@@ -117,7 +118,6 @@ Here are some useful links that help you to test whether your new Mailserver wor
 # Issues
 This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
 
-* [#2](https://github.com/technicalguru/docker-mailserver-postfix/issues/2) - DKIM support is missing
 * [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
 
 # Contribution
