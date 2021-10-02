@@ -1,13 +1,13 @@
-FROM debian:10.3
+FROM debian:11.0
 LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-ENV PF_VERSION="3.4.14"
-ENV PF_REVISION="0"
+ENV PF_VERSION="3.5.6"
+ENV PF_REVISION="1"
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=3.4.14-0+deb10u1 \
+    && PF_VERSION=3.5.6-1+b1 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \

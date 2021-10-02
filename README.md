@@ -14,8 +14,8 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.4.14.0, 3.4.14, 3.4, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
-* [3.4.10.1, 3.4.10](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.10.1) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.10.2/Dockerfile)
+* [3.5.6.0, 3.5.6, 3.5, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.5.6.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.5.6.0/Dockerfile)
+* [3.4.14.0, 3.4.14, 3.4](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
 
 # Features
 * Bootstrap from scratch: See more information below.
