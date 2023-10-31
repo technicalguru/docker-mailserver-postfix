@@ -24,13 +24,14 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     dovecot-managesieved \
     dovecot-antispam \
     mailutils \
-	vim \
+    vim \
     rsyslog \
     dnsutils \
     telnet \
     opendkim \
     opendkim-tools \
     ca-certificates \
+    libsasl2-modules \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /usr/local/mailserver \
