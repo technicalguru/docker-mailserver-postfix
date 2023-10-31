@@ -1,13 +1,13 @@
-FROM debian:11
+FROM debian:12
 LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-ENV PF_VERSION="3.5.18"
+ENV PF_VERSION="3.7.6"
 ENV PF_REVISION="1"
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=3.5.18-0+deb11u1 \
+    && PF_VERSION=3.7.6-0+deb12u2 \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \
@@ -24,7 +24,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     dovecot-managesieved \
     dovecot-antispam \
     mailutils \
-	vim \
+    vim \
     rsyslog \
     dnsutils \
     telnet \
