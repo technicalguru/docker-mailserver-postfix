@@ -436,9 +436,6 @@ check_database
 #########################
 cd $IMAGE_HOME
 
-# Start log facility
-service rsyslog start
-
 # Configure Sieve rule
 configure_sieve
 
@@ -446,6 +443,7 @@ configure_sieve
 configure_postfix
 configure_instance -
 postconf compatibility_level=2
+postconf maillog_file=/var/log/mail.log
 
 # Start Dovecot (the mail drop software)
 service dovecot start
