@@ -148,6 +148,10 @@ virtual_mailbox_maps =
 ## OTHER
 ##
 
+### SMTP smuggling
+smtpd_forbid_bare_newline = yes
+smtpd_forbid_bare_newline_exclusions = $mynetworks
+
 ### Mailbox size
 mailbox_size_limit = 0
 
