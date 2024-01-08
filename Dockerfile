@@ -26,6 +26,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     dovecot-antispam \
     mailutils \
 	vim \
+    libsasl2-modules \
     rsyslog \
     dnsutils \
     telnet \

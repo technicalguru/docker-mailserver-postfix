@@ -14,7 +14,7 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.7.9.0, 3.7.9, 3.7, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.7.9.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.7.9.0/Dockerfile)
+* [3.7.9.1, 3.7.9, 3.7, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.7.9.1) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.7.9.1/Dockerfile)
 * [3.5.18.0, 3.5.18, 3.5](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.5.18.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.5.18.0/Dockerfile)
 * [3.4.14.0, 3.4.14, 3.4](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
 
@@ -123,3 +123,8 @@ This Docker image is mature and replaced my own mailserver in production. Howeve
 
 # Contribution
 Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues). Make sure you have checked out the [Contribution Guideline](CONTRIBUTING.md)
+
+Thanks for their contribution to this image go to:
+
+* [@jeroenrnl](https://github.com/jeroenrnl)
+
