@@ -117,6 +117,10 @@ EXPOSE 993
 EXPOSE 995
 # SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
 EXPOSE 10025
+
+# populate persistent data
+VOLUME ["/etc/postfix", "/var/spool/postfix", "/var/vmail"]
+
 #CMD ["/usr/local/mailserver/loop.sh"]
 CMD ["/usr/local/mailserver/entrypoint.sh"]
 
