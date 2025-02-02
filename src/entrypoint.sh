@@ -343,7 +343,7 @@ check_database_user() {
 
 create_database() {
 	echo "Creating database..."
-	echo "CREATE DATABASE IF NOT EXISTS $PF_DB_NAME;" |  mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
+	echo "CREATE DATABASE IF NOT EXISTS $PF_DB_NAME CHARACTER SET latin1 COLLATE latin1_general_ci;" |  mysql -u root --password=$PF_SETUP_PASS -h $PF_DB_HOST
 	if [[ $? -ne 0 ]]
 	then
 		echo "Cannot create database $PF_DB_NAME" 1>&2
