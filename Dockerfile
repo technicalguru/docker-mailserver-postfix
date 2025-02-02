@@ -1,4 +1,6 @@
-FROM debian:12
+ARG ARCH
+
+FROM ${ARCH}debian:12
 LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
@@ -70,7 +72,8 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
     && cd /etc/opendkim \
     && opendkim-genkey --selector=key1 --bits=2048 --directory=keys \
     && chown opendkim /etc/opendkim/keys/key1.private \
-    && usermod -aG opendkim postfix
+    && usermod -aG opendkim postfix \
+    && cp -rfp /etc/postfix /etc/postfix_orig
 
 #####################################################################
 #  Image OCI labels
@@ -121,6 +124,9 @@ EXPOSE 10025
 # populate persistent data
 VOLUME ["/etc/postfix", "/var/spool/postfix", "/var/vmail"]
 
+CMD ["sh", "-c","[ -z \"$(ls -A /etc/postfix)\" ] && cp -arfp /etc/postfix_orig/. /etc/postfix/ ; /usr/local/mailserver/entrypoint.sh"]
+
+#CMD ["/usr/local/mailserver/entrypoint.sh"]
 #CMD ["/usr/local/mailserver/loop.sh"]
-CMD ["/usr/local/mailserver/entrypoint.sh"]
+
 
