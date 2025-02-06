@@ -417,6 +417,10 @@ configure_sieve() {
 	chown -R vmail:vmail /var/vmail/sieve
 }
 
+create_persistent_data() {
+	[ -z "$(ls -A /etc/postfix)" ] && cp -arfp /etc/postfix_orig/. /etc/postfix/
+}
+
 # Stopping all (we got a TERM signal at this point)
 _sigterm() {
 	echo "Caught SIGTERM..."
@@ -425,6 +429,9 @@ _sigterm() {
 	service rsyslog stop
 	kill -TERM "$TAIL_CHILD_PID" 2>/dev/null
 }
+
+# bootstrap data
+create_persistent_data
 
 #########################
 # Installation check

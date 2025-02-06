@@ -1,21 +1,22 @@
-FROM debian:12
+ARG ARCH
+
+FROM ${ARCH}debian:12
 LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
+ARG PF_REVISION="0"
+ARG PF_PACKAGE=""
 
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-ENV PF_VERSION="3.7.9"
-ENV PF_REVISION="0"
-ENV PF_PACKAGE="3.7.9-0+deb12u1"
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=${PF_PACKAGE} \
+    && { ! [ -z "${PF_PACKAGE}" ] && export PF_VERSION="=${PF_PACKAGE}" || export PF_VERSION=""; } \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \
     apt-utils \
     procps \
-    postfix=${PF_VERSION} \
-    postfix-mysql=${PF_VERSION} \
+    postfix${PF_VERSION} \
+    postfix-mysql${PF_VERSION} \
     dovecot-core \
     dovecot-imapd \
     dovecot-pop3d \
@@ -70,7 +71,8 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
     && cd /etc/opendkim \
     && opendkim-genkey --selector=key1 --bits=2048 --directory=keys \
     && chown opendkim /etc/opendkim/keys/key1.private \
-    && usermod -aG opendkim postfix
+    && usermod -aG opendkim postfix \
+    && mv -f /etc/postfix /etc/postfix_orig && ln -s /etc/postfix_orig /etc/postfix
 
 #####################################################################
 #  Image OCI labels
@@ -78,7 +80,7 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
 ARG ARG_CREATED
 ARG ARG_URL=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_SOURCE=https://github.com/technicalguru/docker-mailserver-postfix
-ARG ARG_VERSION="${PF_VERSION}.${PF_REVISION}"
+ARG ARG_VERSION="${PF_PACKAGE}.${PF_REVISION}"
 ARG ARG_REVISION="${PF_REVISION}"
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
@@ -117,6 +119,11 @@ EXPOSE 993
 EXPOSE 995
 # SMTP Port (used for internal delivery from amavis, do not expose to the outside world!)
 EXPOSE 10025
-#CMD ["/usr/local/mailserver/loop.sh"]
+
+# populate persistent data
+VOLUME ["/etc/postfix", "/var/spool/postfix", "/var/vmail"]
+
 CMD ["/usr/local/mailserver/entrypoint.sh"]
+#CMD ["/usr/local/mailserver/loop.sh"]
+
 
