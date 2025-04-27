@@ -74,6 +74,9 @@ fi
 if [[ -z "${PF_MILTERS}" ]]; then
 	PF_MILTERS=
 fi
+if [[ -z "${PF_ADD_MYNETWORKS}" ]]; then
+	PF_ADD_MYNETWORKS=
+fi
 ####################
 # Helper functions
 ####################
@@ -131,6 +134,7 @@ copy_template_file() {
 		replace_var $TMP_DST 'PF_DB_PASS'
 		replace_var $TMP_DST 'PF_ENABLE_UTF8'
 		replace_var $TMP_DST 'PF_MILTERS'
+		replace_var $TMP_DST 'PF_ADD_MYNETWORKS'
 	fi
 	if [ ! -f $TMP_DST ]; then
 		echo "Cannot create $TMP_DST" 1>&2
