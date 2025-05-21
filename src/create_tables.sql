@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `alias` (
   `created` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `modified` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`address`)
+  UNIQUE KEY `address` (`address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Aliases';
 
 CREATE TABLE IF NOT EXISTS `alias_domain` (
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `alias_domain` (
   `created` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `modified` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`alias_domain`)
+  UNIQUE KEY `alias_domain` (`alias_domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Domain Aliases';
 
 CREATE TABLE IF NOT EXISTS `domain` (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `created` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `modified` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (`domain`)
+  UNIQUE KEY `domain` (`domain`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Domains';
 
 CREATE TABLE IF NOT EXISTS `mailbox` (
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
   `email_other` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `token` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `token_validity` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
-  PRIMARY KEY (`username`)
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Postfix Admin - Virtual Mailboxes';
 
 CREATE TABLE IF NOT EXISTS `tlspolicies` (
