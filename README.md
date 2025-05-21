@@ -117,9 +117,7 @@ Here are some useful links that help you to test whether your new Mailserver wor
 * [**SMTP Test**](https://mxtoolbox.com/diagnostic.aspx) - A general mailserver diagnostic tool
 
 # Issues
-This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
-
-* [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
+No issues known right now. Please refer to [Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues).
 
 # Contribution
 Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues). Make sure you have checked out the [Contribution Guideline](CONTRIBUTING.md)
