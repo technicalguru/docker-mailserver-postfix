@@ -61,6 +61,7 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
 | `PF_TLS_ADMIN_EMAIL` | E-mail address to be notified when TLS certificate is about to expire (10 days) | `postmaster@$PF_MYDOMAIN` |
+| `PF_ADD_MYNETWORKS`| A string containing additional subnets with a mask to add to the `mynetworks` file in main.cf  |  |
 
 ## Volumes
 You need to provide data volumes in order to secure your mailboxes from data loss. 
