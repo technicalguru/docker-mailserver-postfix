@@ -18,6 +18,10 @@ The following versions are available from DockerHub. The image tag matches the P
 * [3.5.18.0, 3.5.18, 3.5](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.5.18.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.5.18.0/Dockerfile)
 * [3.4.14.0, 3.4.14, 3.4](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
 
+# Supported Platforms
+* linux/amd64
+* linux/arm64
+
 # Features
 * Bootstrap from scratch: See more information below.
 * Standard SMTP and IMAP ports
