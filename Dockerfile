@@ -4,18 +4,13 @@ LABEL maintainer="Ralph Schuster <github@ralph-schuster.eu>"
 RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections
 RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 
-ENV PF_VERSION="3.7.11"
-ENV PF_REVISION="0"
-ENV PF_PACKAGE="3.7.11-0+deb12u1"
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && PF_VERSION=${PF_PACKAGE} \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     default-mysql-client \
     apt-utils \
     procps \
-    postfix=${PF_VERSION} \
-    postfix-mysql=${PF_VERSION} \
+    postfix \
+    postfix-mysql \
     dovecot-core \
     dovecot-imapd \
     dovecot-pop3d \
@@ -78,8 +73,6 @@ RUN chmod 755 /usr/local/mailserver/*.sh \
 ARG ARG_CREATED
 ARG ARG_URL=https://github.com/technicalguru/docker-mailserver-postfix
 ARG ARG_SOURCE=https://github.com/technicalguru/docker-mailserver-postfix
-ARG ARG_VERSION="${PF_VERSION}.${PF_REVISION}"
-ARG ARG_REVISION="${PF_REVISION}"
 ARG ARG_VENDOR=technicalguru
 ARG ARG_TITLE=technicalguru/mailserver-postfix
 ARG ARG_DESCRIPTION="Provides Postfix/Dovecot MTA/MDA based on Debian with MySQL backend"
@@ -90,8 +83,6 @@ ARG ARG_LICENSES=GPL-3.0-or-later
 LABEL org.opencontainers.image.created=$ARG_CREATED
 LABEL org.opencontainers.image.url=$ARG_URL
 LABEL org.opencontainers.image.source=$ARG_SOURCE
-LABEL org.opencontainers.image.version=$ARG_VERSION
-LABEL org.opencontainers.image.revision=$ARG_REVISION
 LABEL org.opencontainers.image.vendor=$ARG_VENDOR
 LABEL org.opencontainers.image.title=$ARG_TITLE
 LABEL org.opencontainers.image.description=$ARG_DESCRIPTION
@@ -119,4 +110,8 @@ EXPOSE 995
 EXPOSE 10025
 #CMD ["/usr/local/mailserver/loop.sh"]
 CMD ["/usr/local/mailserver/entrypoint.sh"]
+
+RUN echo "Postfix version: $(postconf -d mail_version)" \
+    && echo "Dovecot version: $(dovecot --version)"
+
 

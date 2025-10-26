@@ -14,9 +14,13 @@ Related images:
 # Tags
 The following versions are available from DockerHub. The image tag matches the Postfix version.
 
-* [3.7.11.2, 3.7.11, 3.7, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.7.11.2) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.7.11.2/Dockerfile)
+* [3.7.11.3, 3.7.11, 3.7, 3, latest](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.7.11.3) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.7.11.3/Dockerfile) (with dovecot/2.3.19.1)
 * [3.5.18.0, 3.5.18, 3.5](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.5.18.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.5.18.0/Dockerfile)
 * [3.4.14.0, 3.4.14, 3.4](https://github.com/technicalguru/docker-mailserver-postfix/tree/v3.4.14.0) - [Dockerfile](https://github.com/technicalguru/docker-mailserver-postfix/blob/3.4.14.0/Dockerfile)
+
+# Supported Platforms
+* linux/amd64
+* linux/arm64
 
 # Features
 * Bootstrap from scratch: See more information below.
@@ -61,6 +65,7 @@ _mailserver-postfix_  requires various environment variables to be set. The cont
 | `PF_TLS_CAPATH` | Directory that contains trusted CA root certificates. | `/etc/ssl/certs` |
 | `PF_TLS_CAFILE` | Name of single file that contains trusted CA root certificates. | `/etc/postfix/CAcert.pem` |
 | `PF_TLS_ADMIN_EMAIL` | E-mail address to be notified when TLS certificate is about to expire (10 days) | `postmaster@$PF_MYDOMAIN` |
+| `PF_ADD_MYNETWORKS`| A string containing additional subnets with a mask to add to the `mynetworks` file in main.cf  |  |
 
 ## Volumes
 You need to provide data volumes in order to secure your mailboxes from data loss. 
@@ -117,9 +122,7 @@ Here are some useful links that help you to test whether your new Mailserver wor
 * [**SMTP Test**](https://mxtoolbox.com/diagnostic.aspx) - A general mailserver diagnostic tool
 
 # Issues
-This Docker image is mature and replaced my own mailserver in production. However, several issues are still unresolved:
-
-* [#3](https://github.com/technicalguru/docker-mailserver-postfix/issues/3) - SPF support is missing
+No issues known right now. Please refer to [Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues).
 
 # Contribution
 Report a bug, request an enhancement or pull request at the [GitHub Issue Tracker](https://github.com/technicalguru/docker-mailserver-postfix/issues). Make sure you have checked out the [Contribution Guideline](CONTRIBUTING.md)
