@@ -27,8 +27,8 @@ tls_ssl_options = NO_COMPRESSION
 tls_high_cipherlist = EDH+CAMELLIA:EDH+aRSA:EECDH+aRSA+AESGCM:EECDH+aRSA+SHA256:EECDH:+CAMELLIA128:+AES128:+SSLv3:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:kEDH:CAMELLIA128-SHA:AES128-SHA
 
 ### OUTGOING SMTP
-smtp_tls_security_level = dane
-smtp_dns_support_level = dnssec
+smtp_tls_security_level = may
+smtp_dns_support_level = enabled
 smtp_tls_policy_maps = 
 #smtp_tls_policy_maps = mysql:/etc/postfix/sql/tls-policy.cf
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
@@ -124,7 +124,7 @@ postscreen_dnsbl_action = drop
 ##
 ##
 content_filter = __PF_AMAVIS_CONTENT_FILTER__
-receive_override_options = no_address_mappings
+#receive_override_options = no_address_mappings
 
 ##
 ## MySQL CONFIG
